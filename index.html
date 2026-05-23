@@ -303,8 +303,14 @@ header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;
 // SUPABASE STORAGE
 // ═══════════════════════════════════════════════════════
 // Используйте другое имя, чтобы не конфликтовать с библиотекой
-const myDB = supabase.createClient('ВАШ_URL', 'ВАШ_KEY');
+// Меняем имя переменной на 'db' (или любое другое)
+const db = supabase.createClient('ВАШ_URL', 'ВАШ_KEY');
 
+// Теперь во всех функциях, которые мы правили, замените supabase на db:
+async function getUsers() {
+  const { data } = await db.from('users').select('*'); // БЫЛО supabase.from, стало db.from
+  // ...
+}
 // И теперь везде в функциях используйте myDB вместо supabase:
 async function getUsers() {
   const { data } = await myDB.from('users').select('*');
