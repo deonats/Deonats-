@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from db_session import get_db
+from session import get_db
 from models import Transaction, Debt, Goal, User
 from models import TransactionTypeEnum, GoalStatusEnum
 from kernel_panic import check_and_block, get_system_status
