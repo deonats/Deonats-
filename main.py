@@ -5,9 +5,9 @@ sys.path.insert(0, os.path.dirname(__file__))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routes import router
-from db.session import engine
-from models.models import Base
+from routes import router
+from db_session import engine
+from models import Base
 
 Base.metadata.create_all(bind=engine)
 
