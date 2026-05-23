@@ -632,7 +632,9 @@ btn.onclick = () => {
   
   // Обновляем цель
   g.current = Math.min(g.target, (g.current || 0) + kztAmt);
-async function save(){ await saveUserData(APP.uid, APP.data) }
+async function save() {
+  await saveUserData(APP.uid, APP.data);
+}
   renderScroll();
   toast(t('saved'));
 };
@@ -698,7 +700,10 @@ function openTxSheet(){
   el('tb-exp').onclick=()=>{APP.txType='expense';openTxSheet()};
   el('tb-inc').onclick=()=>{APP.txType='income';openTxSheet()};
   el('tx-cat').onchange=e=>{APP.txCat=e.target.value};
-  el('tx-sub').onclick=()=>{
+ el('tx-sub').onclick = async () => {
+  // ... ваш код ...
+  await save(); // Правильно!
+};
     const raw=parseFloat((el('tx-amt').value||'0').replace(',','.'));
     if(isNaN(raw)||raw<=0)return;
     const kzt=raw/CUR[APP.cur].r;
