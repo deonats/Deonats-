@@ -302,9 +302,14 @@ header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;
 // ═══════════════════════════════════════════════════════
 // SUPABASE STORAGE
 // ═══════════════════════════════════════════════════════
-const supabase = supabase.createClient('ВАШ_URL_ИЗ_SUPABASE', 'ВАШ_API_KEY_ИЗ_SUPABASE');
-  const supabase = supabase.createClient('ВАШ_PROJECT_URL', 'ВАШ_API_KEY');
+// Используйте другое имя, чтобы не конфликтовать с библиотекой
+const myDB = supabase.createClient('ВАШ_URL', 'ВАШ_KEY');
 
+// И теперь везде в функциях используйте myDB вместо supabase:
+async function getUsers() {
+  const { data } = await myDB.from('users').select('*');
+  // ... и так далее
+}
 async function getUsers() {
   const { data } = await supabase.from('users').select('*');
   if (!data) return {};
