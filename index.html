@@ -138,7 +138,7 @@
   </style>
 </head>
 <body>
-<div id="app" class="dark"></div>
+<div id="app" class="dark"><div id="root"></div></div>
 
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -409,7 +409,7 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("app")).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
 </script>
 </body>
 </html>
