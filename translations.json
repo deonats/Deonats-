@@ -1,0 +1,76 @@
+{
+  "ru": {
+    "terminal": {
+      "placeholder": "введите команду...",
+      "boot": "DEONATS v1.0.0 — ЯДРО ЗАПУЩЕНО",
+      "help_hint": "введите 'help' для списка команд",
+      "auth_prompt": "ТРЕБУЕТСЯ MASTER PASSWORD",
+      "locked": "АККАУНТ ЗАБЛОКИРОВАН",
+      "kernel_panic": "ЯДРО: ПАНИКА — КАТЕГОРИЯ ЗАБЛОКИРОВАНА",
+      "login": "ВХОД В СИСТЕМУ",
+      "logout": "ВЫХОД ИЗ СИСТЕМЫ"
+    },
+    "commands": {
+      "help": "Список команд",
+      "add": "Добавить транзакцию",
+      "status": "Статус ядра",
+      "goal_add": "Создать цель",
+      "goal_status": "Статус целей",
+      "repay": "Погасить долг",
+      "clear": "Очистить терминал",
+      "theme": "Переключить тему",
+      "lang": "Сменить язык"
+    },
+    "status": {
+      "ok": "ОК",
+      "blocked": "ЗАБЛОКИРОВАНО",
+      "warning": "ПРЕДУПРЕЖДЕНИЕ",
+      "panic": "ПАНИКА ЯДРА",
+      "completed": "ВЫПОЛНЕНО",
+      "violated": "НАРУШЕНИЕ"
+    },
+    "goals": {
+      "created": "ЦЕЛЬ СОЗДАНА",
+      "completed": "ЦЕЛЬ ДОСТИГНУТА",
+      "penalty": "ПРИМЕНЁН ШТРАФ ЗА НАРУШЕНИЕ",
+      "progress": "ПРОГРЕСС"
+    }
+  },
+  "en": {
+    "terminal": {
+      "placeholder": "enter command...",
+      "boot": "DEONATS v1.0.0 — KERNEL RUNNING",
+      "help_hint": "type 'help' for command list",
+      "auth_prompt": "MASTER PASSWORD REQUIRED",
+      "locked": "ACCOUNT LOCKED",
+      "kernel_panic": "KERNEL PANIC — CATEGORY BLOCKED",
+      "login": "SYSTEM LOGIN",
+      "logout": "SYSTEM LOGOUT"
+    },
+    "commands": {
+      "help": "Command list",
+      "add": "Add transaction",
+      "status": "Kernel status",
+      "goal_add": "Create goal",
+      "goal_status": "Goal status",
+      "repay": "Repay debt",
+      "clear": "Clear terminal",
+      "theme": "Toggle theme",
+      "lang": "Switch language"
+    },
+    "status": {
+      "ok": "OK",
+      "blocked": "BLOCKED",
+      "warning": "WARNING",
+      "panic": "KERNEL PANIC",
+      "completed": "COMPLETED",
+      "violated": "VIOLATED"
+    },
+    "goals": {
+      "created": "GOAL CREATED",
+      "completed": "GOAL ACHIEVED",
+      "penalty": "INTEGRITY VIOLATION FEE APPLIED",
+      "progress": "PROGRESS"
+    }
+  }
+}
