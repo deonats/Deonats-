@@ -60,6 +60,7 @@ html,body{height:100%;background:var(--bg);font-family:var(--f);color:var(--fg);
 .btn-primary:disabled{opacity:.4}
 .login-switch{font-size:14px;color:var(--fg2);text-align:center;margin-top:16px}
 .login-switch span{color:var(--blue);cursor:pointer;font-weight:500}
+#reg-form{flex-direction:column}
 .login-err{font-size:13px;color:var(--red);text-align:center;min-height:18px;
   animation:fadein .3s var(--eo)}
 @keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
@@ -253,7 +254,7 @@ header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;
       <div class="login-switch">Нет аккаунта? <span id="go-reg">Создать</span></div>
     </div>
 
-    <div style="display:none;width:100%;max-width:340px;flex-direction:column;gap:12px" id="reg-form">
+    <div style="display:none;width:100%;max-width:340px;gap:12px" id="reg-form">
       <input class="finp" id="rg-user" type="text" placeholder="Имя пользователя" autocomplete="username" autocapitalize="none"/>
       <input class="finp" id="rg-disp" type="text" placeholder="Ваше имя (отображается)" autocapitalize="words"/>
       <input class="finp" id="rg-pass" type="password" placeholder="Пин-код (6 цифр)" autocomplete="new-password" inputmode="numeric" maxlength="6"/>
