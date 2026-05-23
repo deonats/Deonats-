@@ -5,7 +5,7 @@ KernelPanicEngine — проверяет лимиты категорий, бло
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from app.models.models import Transaction, CategoryLimit, SystemLog, TransactionTypeEnum
+from models import ...
 
 
 KERNEL_PANIC_THRESHOLD = 1.0  # 100% лимита = паника
