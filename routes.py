@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.db.session import get_db
-from app.models.models import (
+from db_session import get_db
+from models import ...
+from kernel_panic import ...
+from penalty import ...
     Transaction, Debt, Goal, User,
     TransactionTypeEnum, GoalStatusEnum
 )
-from app.engines.kernel_panic import check_and_block, get_system_status
-from app.engines.penalty import deposit_to_goal, withdraw_from_goal
 from app.services.security import authenticate
 
 router = APIRouter(prefix="/api/v1", tags=["deonats-kernel"])
