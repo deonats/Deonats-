@@ -580,6 +580,32 @@ function renderScroll(){
       </div>
       <div class="ptr"><div class="pf ${g.color||'g'}" style="width:${pct}%"></div></div>
       <div class="gc-ft"><div class="gc-pc">${pct}%</div><div class="gc-pc">${s()}${fmt(dleft)} ${t('left')}</div></div>`;
+    // ... после блока <div class="gc-ft"> ...
+const depDiv = ce('div', 'gc-dep');
+depDiv.style.display = 'flex';
+depDiv.style.gap = '8px';
+depDiv.style.marginTop = '12px';
+depDiv.innerHTML = `
+  <input type="number" class="finp" placeholder="${t('amt')}" style="padding:8px; height:auto; border-radius:8px">
+  <button class="ibtn" style="background:var(--blue); color:#fff">OK</button>
+`;
+const inp = depDiv.querySelector('input');
+const btn = depDiv.querySelector('button');
+
+btn.onclick = () => {
+  const val = parseFloat(inp.value);
+  if (isNaN(val) || val <= 0) return;
+  
+  // Конвертируем введенную сумму в KZT (базовая валюта)
+  const kztAmt = val / CUR[APP.cur].r;
+  
+  // Обновляем цель
+  g.current = Math.min(g.target, (g.current || 0) + kztAmt);
+  save();
+  renderScroll();
+  toast(t('saved'));
+};
+gc.appendChild(depDiv);
     gl.appendChild(gc);
   });
   // add goal card
