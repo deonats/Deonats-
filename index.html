@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="mobile-web-app-capable" content="yes"/>
@@ -295,16 +296,34 @@ header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;
 // ═══════════════════════════════════════════════════════
 // STORAGE HELPERS
 // ═══════════════════════════════════════════════════════
-const DB = {
-  get(k){ try{return JSON.parse(localStorage.getItem(k))}catch{return null} },
-  set(k,v){ localStorage.setItem(k,JSON.stringify(v)) },
-  del(k){ localStorage.removeItem(k) }
-};
-function getUsers(){ return DB.get('dn_users') || {} }
-function saveUsers(u){ DB.set('dn_users',u) }
-function getUserData(uid){ return DB.get('dn_data_'+uid) || {tx:[],goals:[]} }
-function saveUserData(uid,d){ DB.set('dn_data_'+uid,d) }
+// ═══════════════════════════════════════════════════════
+// STORAGE HELPERS
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// SUPABASE STORAGE
+// ═══════════════════════════════════════════════════════
+const supabase = supabase.createClient('ВАШ_URL_ИЗ_SUPABASE', 'ВАШ_API_KEY_ИЗ_SUPABASE');
 
+async function getUsers() {
+  const { data } = await supabase.from('users').select('*');
+  if (!data) return {};
+  return data.reduce((acc, u) => ({ ...acc, [u.id]: u }), {});
+}
+
+async function saveUsers(users) {
+  // Для простоты сохраняем в таблицу users
+  const formatted = Object.keys(users).map(id => ({ id, name: users[id].name, pin: users[id].pin }));
+  await supabase.from('users').upsert(formatted);
+}
+
+async function getUserData(uid) {
+  const { data } = await supabase.from('data').select('*').eq('uid', uid).single();
+  return data || { tx: [], goals: [] };
+}
+
+async function saveUserData(uid, d) {
+  await supabase.from('data').upsert({ uid: uid, tx: d.tx, goals: d.goals });
+}
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
