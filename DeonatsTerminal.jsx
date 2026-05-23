@@ -39,7 +39,7 @@ const T = {
 };
 
 // ─── Mock API (demo mode — replace with real fetch) ───────────────────────────
-const API_BASE = "http://localhost:8000/api/v1";
+const API_BASE = "https://deonats-production.up.railway.app/api/v1";
 
 async function apiCall(path, method = "GET", body = null) {
   try {
