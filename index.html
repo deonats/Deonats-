@@ -1,488 +1,735 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Deonats</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:#000000; --bg2:#0D0D0D; --card:#1C1C1E; --card2:#2C2C2E; --card3:#3A3A3C;
-      --border:rgba(255,255,255,0.08); --fg:#FFFFFF; --fg2:rgba(255,255,255,0.55);
-      --fg3:rgba(255,255,255,0.28); --accent-bg:rgba(255,255,255,0.09);
-      --green:#30D158; --red:#FF453A; --gold:#FFD60A; --blue:#0A84FF;
-      --r:22px; --rsm:14px; --rxs:10px;
-      --shadow:0 8px 40px rgba(0,0,0,0.55);
-      --font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
-      --mono:'DM Mono','SF Mono',monospace;
-      --spring:cubic-bezier(0.34,1.56,0.64,1);
-      --eout:cubic-bezier(0.16,1,0.3,1);
-      --safe-top:env(safe-area-inset-top,0px);
-      --safe-bot:env(safe-area-inset-bottom,0px);
-    }
-    body.light {
-      --bg:#F2F2F7; --bg2:#E5E5EA; --card:#FFFFFF; --card2:#F2F2F7; --card3:#E5E5EA;
-      --border:rgba(0,0,0,0.07); --fg:#000000; --fg2:rgba(0,0,0,0.5); --fg3:rgba(0,0,0,0.25);
-      --accent-bg:rgba(0,0,0,0.06); --shadow:0 8px 40px rgba(0,0,0,0.1);
-    }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--fg);overflow:hidden;transition:background .3s,color .3s}
-    #app{width:100%;max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<title>Deonats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#000;--bg2:#0d0d0d;--card:#1c1c1e;--card2:#2c2c2e;--card3:#3a3a3c;
+  --border:rgba(255,255,255,.08);--fg:#fff;--fg2:rgba(255,255,255,.55);
+  --fg3:rgba(255,255,255,.28);--abg:rgba(255,255,255,.09);
+  --green:#30d158;--red:#ff453a;--gold:#ffd60a;--blue:#0a84ff;--purple:#bf5af2;
+  --r:22px;--rsm:14px;--rxs:10px;
+  --sh:0 8px 40px rgba(0,0,0,.55);
+  --f:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --m:'DM Mono','SF Mono',monospace;
+  --sp:cubic-bezier(.34,1.56,.64,1);
+  --eo:cubic-bezier(.16,1,.3,1);
+  --st:env(safe-area-inset-top,0px);
+  --sb:env(safe-area-inset-bottom,0px);
+}
+body.light{
+  --bg:#f2f2f7;--bg2:#e5e5ea;--card:#fff;--card2:#f2f2f7;--card3:#e5e5ea;
+  --border:rgba(0,0,0,.07);--fg:#000;--fg2:rgba(0,0,0,.5);--fg3:rgba(0,0,0,.25);
+  --abg:rgba(0,0,0,.06);--sh:0 8px 40px rgba(0,0,0,.1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);font-family:var(--f);color:var(--fg);overflow:hidden}
+#root{width:100%;max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);position:relative;overflow:hidden;transition:background .3s}
 
-    /* ── LOCK ── */
-    #lock{position:absolute;inset:0;z-index:500;background:linear-gradient(160deg,#1a1a2e,#0d0d1a 50%,#0a0a14);display:flex;flex-direction:column;align-items:center;padding-top:calc(80px + var(--safe-top));transition:transform .6s var(--eout),opacity .6s var(--eout)}
-    #lock.out{transform:translateY(-100%);opacity:0;pointer-events:none}
-    .lk-time{font-size:76px;font-weight:200;letter-spacing:-2px;color:#fff;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums}
-    .lk-date{font-size:17px;color:rgba(255,255,255,.7);margin-bottom:56px}
-    .lk-logo{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,#2a2a40,#1a1a30);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-    .lk-letter{font-size:36px;font-weight:300;color:#fff}
-    .lk-name{font-size:17px;font-weight:500;color:#fff;margin-bottom:44px}
-    .lk-hint{font-size:14px;color:rgba(255,255,255,.45);margin-bottom:26px;letter-spacing:.2px;min-height:20px;transition:color .2s}
-    .lk-hint.err{color:#FF453A}
-    .pin-dots{display:flex;gap:20px;justify-content:center;margin-bottom:30px}
-    .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:all .2s var(--spring)}
-    .pin-dot.on{background:#fff;border-color:#fff;transform:scale(1.1)}
-    .pin-dot.err{background:#FF453A;border-color:#FF453A;animation:shake .4s var(--eout)}
-    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-    .pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:280px}
-    .pk{height:72px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:transform .15s var(--spring),background .1s;backdrop-filter:blur(20px)}
-    .pk:active{transform:scale(.88);background:rgba(255,255,255,.22)}
-    .pk-n{font-size:26px;font-weight:300;line-height:1}
-    .pk-s{font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,.5);text-transform:uppercase}
-    .pk.ghost{background:transparent;pointer-events:none}
-    .pk.del{background:transparent}
-    .pk.del:active{background:rgba(255,255,255,.08)}
+/* ── SCREENS ── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  transition:transform .45s var(--eo),opacity .35s var(--eo);will-change:transform,opacity}
+.screen.off-left{transform:translateX(-100%);opacity:0;pointer-events:none}
+.screen.off-right{transform:translateX(100%);opacity:0;pointer-events:none}
+.screen.off-down{transform:translateY(100%);opacity:0;pointer-events:none}
+.screen.off-up{transform:translateY(-100%);opacity:0;pointer-events:none}
 
-    /* ── MAIN ── */
-    #main{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:var(--bg);transform:scale(.92);opacity:0;pointer-events:none;transition:transform .5s var(--spring),opacity .4s var(--eout)}
-    #main.show{transform:scale(1);opacity:1;pointer-events:all}
+/* ── LOGIN SCREEN ── */
+#s-login{background:var(--bg);align-items:center;justify-content:center;padding:40px 24px}
+.login-logo{width:90px;height:90px;border-radius:26px;background:linear-gradient(135deg,#1e1e3a,#0d0d1e);
+  border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.login-letter{font-size:42px;font-weight:200;color:#fff}
+.login-title{font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:6px;text-align:center}
+.login-sub{font-size:15px;color:var(--fg2);margin-bottom:40px;text-align:center}
+.login-form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+.finp{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:var(--rxs);
+  padding:16px;color:var(--fg);font-family:var(--f);font-size:16px;outline:none;
+  transition:border-color .2s var(--eo);-webkit-appearance:none}
+.finp:focus{border-color:var(--blue)}
+.finp::placeholder{color:var(--fg3)}
+.btn-primary{width:100%;height:56px;border-radius:var(--rsm);border:none;
+  background:var(--fg);color:var(--bg);font-family:var(--f);font-size:16px;font-weight:600;
+  cursor:pointer;transition:transform .2s var(--sp),opacity .2s;margin-top:4px}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{opacity:.4}
+.login-switch{font-size:14px;color:var(--fg2);text-align:center;margin-top:16px}
+.login-switch span{color:var(--blue);cursor:pointer;font-weight:500}
+.login-err{font-size:13px;color:var(--red);text-align:center;min-height:18px;
+  animation:fadein .3s var(--eo)}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ── HEADER ── */
-    header{padding:calc(14px + var(--safe-top)) 20px 10px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);position:sticky;top:0;z-index:100}
-    .logo{font-size:18px;font-weight:600;letter-spacing:-.4px}
-    .hdr-r{display:flex;gap:6px;align-items:center}
-    .ibtn{height:34px;border-radius:100px;border:none;background:var(--accent-bg);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;padding:0 12px;font-family:var(--font);transition:all .2s var(--eout);letter-spacing:.3px}
-    .ibtn:active{transform:scale(.92);background:var(--card3)}
-    .ibtn.on{background:var(--accent-bg);color:var(--fg)}
-    .ibtn.off{color:var(--fg2)}
+/* ── LOCK SCREEN ── */
+#s-lock{background:linear-gradient(160deg,#1a1a2e,#0d0d1a 50%,#0a0a14);
+  align-items:center;padding-top:calc(80px + var(--st))}
+.lk-time{font-size:76px;font-weight:200;letter-spacing:-2px;color:#fff;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums}
+.lk-date{font-size:17px;color:rgba(255,255,255,.7);margin-bottom:48px}
+.lk-user{font-size:15px;color:rgba(255,255,255,.5);margin-bottom:8px}
+.lk-name{font-size:20px;font-weight:500;color:#fff;margin-bottom:44px}
+.lk-hint{font-size:14px;color:rgba(255,255,255,.45);margin-bottom:24px;min-height:20px;transition:color .2s}
+.lk-hint.err{color:var(--red)}
+.pin-dots{display:flex;gap:20px;justify-content:center;margin-bottom:28px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:all .2s var(--sp)}
+.pin-dot.on{background:#fff;border-color:#fff;transform:scale(1.1)}
+.pin-dot.err{background:var(--red);border-color:var(--red);animation:shake .4s var(--eo)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:280px}
+.pk{height:72px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  transition:transform .15s var(--sp),background .1s;backdrop-filter:blur(20px)}
+.pk:active{transform:scale(.88);background:rgba(255,255,255,.22)}
+.pk-n{font-size:26px;font-weight:300;line-height:1}
+.pk-s{font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,.5);text-transform:uppercase}
+.pk.ghost{background:transparent;pointer-events:none}
+.pk.del{background:transparent}
+.pk.del:active{background:rgba(255,255,255,.08)}
+.lk-logout{font-size:13px;color:rgba(255,255,255,.35);margin-top:24px;cursor:pointer}
+.lk-logout:active{color:rgba(255,255,255,.6)}
 
-    /* ── SCROLL ── */
-    .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 20px calc(110px + var(--safe-bot));display:flex;flex-direction:column;gap:22px;-webkit-overflow-scrolling:touch}
-    .scroll::-webkit-scrollbar{display:none}
+/* ── MAIN SCREEN ── */
+#s-main{background:var(--bg)}
+header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);z-index:10;flex-shrink:0}
+.logo{font-size:18px;font-weight:600;letter-spacing:-.4px}
+.hdr-r{display:flex;gap:6px;align-items:center}
+.ibtn{height:34px;border-radius:100px;border:none;background:var(--abg);color:var(--fg);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;
+  padding:0 12px;font-family:var(--f);transition:all .2s var(--eo);letter-spacing:.3px}
+.ibtn:active{transform:scale(.92);background:var(--card3)}
+.ibtn.dim{color:var(--fg2)}
 
-    /* ── CURRENCY ── */
-    .cur-wrap{display:flex;gap:5px;background:var(--card);border-radius:100px;padding:4px;border:1px solid var(--border);align-self:flex-start}
-    .cur-btn{height:30px;padding:0 14px;border-radius:100px;border:none;background:transparent;color:var(--fg2);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .25s var(--spring)}
-    .cur-btn.on{background:var(--card2);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.18);transform:scale(1.03)}
+/* ── SCROLL ── */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:12px 20px calc(110px + var(--sb));display:flex;flex-direction:column;gap:22px;
+  -webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+.scroll::-webkit-scrollbar{display:none}
 
-    /* ── BALANCE ── */
-    .bal-card{background:var(--card);border-radius:var(--r);padding:24px 24px 20px;border:1px solid var(--border);box-shadow:var(--shadow);animation:sup .5s var(--eout) both}
-    @keyframes sup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-    .bal-lbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px}
-    .bal-num{font-size:clamp(34px,9vw,44px);font-weight:300;letter-spacing:-1.5px;line-height:1;margin-bottom:20px;display:flex;align-items:flex-start;gap:4px}
-    .bal-cur{font-size:22px;font-weight:400;opacity:.45;margin-top:5px}
-    .bal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .bstat{background:var(--accent-bg);border-radius:var(--rsm);padding:14px;transition:transform .2s var(--spring)}
-    .bstat:active{transform:scale(.97)}
-    .bstat-l{font-size:11px;color:var(--fg2);margin-bottom:5px;font-weight:500;letter-spacing:.5px}
-    .bstat-v{font-size:18px;font-weight:500;letter-spacing:-.3px}
-    .clr-g{color:var(--green)} .clr-r{color:var(--red)}
+/* ── CURRENCY ── */
+.cur-wrap{display:flex;gap:4px;background:var(--card);border-radius:100px;
+  padding:4px;border:1px solid var(--border);align-self:flex-start}
+.cur-btn{height:30px;padding:0 13px;border-radius:100px;border:none;background:transparent;
+  color:var(--fg2);font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;
+  transition:all .25s var(--sp)}
+.cur-btn.on{background:var(--card2);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.18);transform:scale(1.03)}
 
-    /* ── SECTION ── */
-    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-    .sec-ttl{font-size:17px;font-weight:600;letter-spacing:-.3px}
-    .sec-lnk{font-size:14px;color:var(--blue);cursor:pointer;font-weight:500}
+/* ── BALANCE ── */
+.bal-card{background:var(--card);border-radius:var(--r);padding:24px 24px 20px;
+  border:1px solid var(--border);box-shadow:var(--sh);animation:sup .5s var(--eo) both}
+@keyframes sup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.bal-lbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px}
+.bal-num{font-size:clamp(34px,9vw,44px);font-weight:300;letter-spacing:-1.5px;line-height:1;
+  margin-bottom:20px;display:flex;align-items:flex-start;gap:4px}
+.bal-sym{font-size:22px;font-weight:400;opacity:.45;margin-top:5px}
+.bal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bst{background:var(--abg);border-radius:var(--rsm);padding:14px;transition:transform .2s var(--sp)}
+.bst:active{transform:scale(.97)}
+.bst-l{font-size:11px;color:var(--fg2);margin-bottom:5px;font-weight:500;letter-spacing:.5px}
+.bst-v{font-size:18px;font-weight:500;letter-spacing:-.3px}
+.clg{color:var(--green)}.clr{color:var(--red)}
 
-    /* ── GOALS ── */
-    .goals{display:flex;flex-direction:column;gap:12px}
-    .gcard{background:var(--card);border-radius:var(--rsm);padding:18px 20px;border:1px solid var(--border);animation:sup .5s var(--eout) both;transition:transform .2s var(--spring)}
-    .gcard:active{transform:scale(.98)}
-    .gcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-    .gico{width:36px;height:36px;border-radius:10px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:6px}
-    .gname{font-size:15px;font-weight:500}
-    .gdl{font-size:12px;color:var(--fg3);margin-top:2px}
-    .gamt{font-size:15px;font-weight:600;text-align:right}
-    .gtgt{font-size:12px;color:var(--fg3);text-align:right;margin-top:2px}
-    .ptrack{height:5px;background:var(--accent-bg);border-radius:100px;overflow:hidden}
-    .pfill{height:100%;border-radius:100px;transition:width 1s var(--eout)}
-    .pfill.g{background:var(--green)} .pfill.gold{background:var(--gold)} .pfill.b{background:var(--blue)}
-    .gfoot{display:flex;justify-content:space-between;margin-top:8px}
-    .gpct{font-size:12px;color:var(--fg2);font-family:var(--mono)}
+/* ── SECTION ── */
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-t{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.sec-a{font-size:14px;color:var(--blue);cursor:pointer;font-weight:500}
 
-    /* ── TX ── */
-    .tx-list{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden}
-    .tx-item{display:flex;align-items:center;gap:14px;padding:14px 18px;transition:background .15s;cursor:pointer;animation:sup .4s var(--eout) both}
-    .tx-item:active{background:var(--accent-bg)}
-    .tx-ico{width:44px;height:44px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-    .tx-info{flex:1;min-width:0}
-    .tx-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .tx-date{font-size:13px;color:var(--fg2);margin-top:2px}
-    .tx-amt{font-size:15px;font-weight:600;font-family:var(--mono);flex-shrink:0}
-    .tx-sep{height:1px;background:var(--border);margin:0 18px}
+/* ── GOALS ── */
+.goals{display:flex;flex-direction:column;gap:12px}
+.gc{background:var(--card);border-radius:var(--rsm);padding:18px 20px;border:1px solid var(--border);
+  animation:sup .5s var(--eo) both;transition:transform .2s var(--sp)}
+.gc:active{transform:scale(.98)}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.gc-ico{width:36px;height:36px;border-radius:10px;background:var(--abg);
+  display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:6px}
+.gc-n{font-size:15px;font-weight:500}
+.gc-dl{font-size:12px;color:var(--fg3);margin-top:2px}
+.gc-a{font-size:15px;font-weight:600;text-align:right}
+.gc-tg{font-size:12px;color:var(--fg3);text-align:right;margin-top:2px}
+.ptr{height:5px;background:var(--abg);border-radius:100px;overflow:hidden}
+.pf{height:100%;border-radius:100px;transition:width 1s var(--eo)}
+.pf.g{background:var(--green)}.pf.gold{background:var(--gold)}.pf.b{background:var(--blue)}
+.gc-ft{display:flex;justify-content:space-between;margin-top:8px}
+.gc-pc{font-size:12px;color:var(--fg2);font-family:var(--m)}
 
-    /* ── FAB ── */
-    .fab{position:fixed;bottom:calc(28px + var(--safe-bot));left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:390px;height:58px;border-radius:100px;border:none;background:var(--fg);color:var(--bg);font-family:var(--font);font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .25s var(--spring),box-shadow .25s;z-index:200;letter-spacing:-.2px}
-    .fab:active{transform:translateX(-50%) scale(.96);box-shadow:0 2px 10px rgba(0,0,0,.2)}
-    .fab-plus{font-size:22px;font-weight:300;line-height:1}
+/* ── ADD GOAL CARD ── */
+.add-card{background:var(--card);border-radius:var(--rsm);padding:18px 20px;border:1.5px dashed var(--border);
+  display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+  transition:border-color .2s,transform .2s var(--sp)}
+.add-card:active{transform:scale(.98)}
+.add-card-t{font-size:15px;font-weight:500;color:var(--fg2)}
 
-    /* ── MODAL ── */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s var(--eout)}
-    .overlay.open{opacity:1;pointer-events:all}
-    .modal{background:var(--card);border-radius:28px 28px 0 0;padding:20px 22px calc(36px + var(--safe-bot));width:100%;max-width:430px;transform:translateY(110%);transition:transform .45s var(--spring);max-height:92dvh;overflow-y:auto}
-    .overlay.open .modal{transform:translateY(0)}
-    .mhandle{width:38px;height:5px;background:var(--card3);border-radius:100px;margin:0 auto 20px}
-    .mttl{font-size:20px;font-weight:600;letter-spacing:-.4px;margin-bottom:20px}
-    .mtabs{display:flex;background:var(--card2);border-radius:12px;padding:3px;margin-bottom:18px;gap:3px}
-    .mtab{flex:1;padding:10px 8px;border-radius:9px;border:none;background:transparent;color:var(--fg2);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .3s var(--spring)}
-    .mtab.on{background:var(--card);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.18);transform:scale(1.02)}
-    .flbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.5px;margin-bottom:7px;display:block;text-transform:uppercase}
-    .finp{width:100%;background:var(--card2);border:1.5px solid transparent;border-radius:var(--rxs);padding:14px 16px;color:var(--fg);font-family:var(--font);font-size:16px;outline:none;transition:all .2s var(--eout);-webkit-appearance:none;margin-bottom:14px}
-    .finp:focus{border-color:var(--blue);background:var(--card)}
-    .finp::placeholder{color:var(--fg3)}
-    .fsel{cursor:pointer}
-    .fsel option{background:var(--card)}
-    .sbtn{width:100%;height:54px;border-radius:14px;border:none;background:var(--fg);color:var(--bg);font-family:var(--font);font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;transition:transform .2s var(--spring)}
-    .sbtn:active{transform:scale(.97)}
+/* ── TX ── */
+.tx-list{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden}
+.tx-item{display:flex;align-items:center;gap:14px;padding:14px 18px;
+  transition:background .15s;cursor:pointer;animation:sup .4s var(--eo) both}
+.tx-item:active{background:var(--abg)}
+.tx-ico{width:44px;height:44px;border-radius:14px;background:var(--card2);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.tx-info{flex:1;min-width:0}
+.tx-n{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-d{font-size:13px;color:var(--fg2);margin-top:2px}
+.tx-a{font-size:15px;font-weight:600;font-family:var(--m);flex-shrink:0}
+.tx-sep{height:1px;background:var(--border);margin:0 18px}
+.empty{text-align:center;padding:32px;color:var(--fg3);font-size:14px;line-height:1.6}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card);color:var(--fg);padding:12px 22px;border-radius:100px;font-size:14px;font-weight:500;z-index:600;transition:transform .4s var(--spring);white-space:nowrap;border:1px solid var(--border);box-shadow:var(--shadow)}
-    .toast.show{transform:translateX(-50%) translateY(0)}
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(28px + var(--sb));left:50%;transform:translateX(-50%);
+  width:calc(100% - 40px);max-width:390px;height:58px;border-radius:100px;border:none;
+  background:var(--fg);color:var(--bg);font-family:var(--f);font-size:16px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .25s var(--sp),box-shadow .25s;
+  z-index:100;letter-spacing:-.2px}
+.fab:active{transform:translateX(-50%) scale(.96);box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.fab-plus{font-size:22px;font-weight:300;line-height:1}
 
-    .s1{animation-delay:.05s}.s2{animation-delay:.1s}.s3{animation-delay:.15s}.s4{animation-delay:.2s}.s5{animation-delay:.25s}.s6{animation-delay:.3s}
-    .empty{text-align:center;padding:28px 0;color:var(--fg3);font-size:14px}
-  </style>
+/* ── BOTTOM SHEET ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);z-index:300;display:flex;align-items:flex-end;
+  justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s var(--eo)}
+.overlay.open{opacity:1;pointer-events:all}
+.sheet{background:var(--card);border-radius:28px 28px 0 0;
+  padding:20px 22px calc(36px + var(--sb));width:100%;max-width:430px;
+  transform:translateY(110%);transition:transform .45s var(--sp);max-height:92dvh;overflow-y:auto}
+.overlay.open .sheet{transform:translateY(0)}
+.sh-handle{width:38px;height:5px;background:var(--card3);border-radius:100px;margin:0 auto 20px}
+.sh-title{font-size:20px;font-weight:600;letter-spacing:-.4px;margin-bottom:20px}
+.mtabs{display:flex;background:var(--card2);border-radius:12px;padding:3px;margin-bottom:18px;gap:3px}
+.mtab{flex:1;padding:10px 8px;border-radius:9px;border:none;background:transparent;color:var(--fg2);
+  font-family:var(--f);font-size:14px;font-weight:500;cursor:pointer;transition:all .3s var(--sp)}
+.mtab.on{background:var(--card);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.18);transform:scale(1.02)}
+.flbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.5px;margin-bottom:7px;
+  display:block;text-transform:uppercase}
+.fg{margin-bottom:14px}
+.fsel{cursor:pointer;-webkit-appearance:none}
+.fsel option{background:var(--card)}
+.sbtn{width:100%;height:54px;border-radius:14px;border:none;background:var(--fg);color:var(--bg);
+  font-family:var(--f);font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;
+  transition:transform .2s var(--sp)}
+.sbtn:active{transform:scale(.97)}
+
+/* ── GOAL SHEET ── */
+.goal-color-row{display:flex;gap:8px;margin-bottom:14px}
+.gc-dot{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;
+  transition:transform .2s var(--sp)}
+.gc-dot.on{border-color:var(--fg);transform:scale(1.1)}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:calc(16px + var(--st));left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  background:var(--card);color:var(--fg);padding:12px 22px;border-radius:100px;
+  font-size:14px;font-weight:500;z-index:600;transition:transform .4s var(--sp);
+  white-space:nowrap;border:1px solid var(--border);box-shadow:var(--sh)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── STAGGER ── */
+.s1{animation-delay:.05s}.s2{animation-delay:.1s}.s3{animation-delay:.15s}
+.s4{animation-delay:.2s}.s5{animation-delay:.25s}.s6{animation-delay:.3s}
+</style>
 </head>
 <body>
-<div id="app">
+<div id="root">
+
+  <!-- LOGIN -->
+  <div class="screen" id="s-login">
+    <div class="login-logo"><span class="login-letter">D</span></div>
+    <div class="login-title">Deonats</div>
+    <div class="login-sub">Личные финансы</div>
+    <div class="login-form" id="login-form">
+      <input class="finp" id="li-user" type="text" placeholder="Имя пользователя" autocomplete="username" autocapitalize="none"/>
+      <input class="finp" id="li-pass" type="password" placeholder="Пароль" autocomplete="current-password"/>
+      <div class="login-err" id="li-err"></div>
+      <button class="btn-primary" id="li-btn">Войти</button>
+      <div class="login-switch">Нет аккаунта? <span id="go-reg">Создать</span></div>
+    </div>
+    <div id="reg-form" style="display:none;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px">
+      <input class="finp" id="rg-user" type="text" placeholder="Имя пользователя" autocomplete="username" autocapitalize="none"/>
+      <input class="finp" id="rg-disp" type="text" placeholder="Ваше имя (отображается)" autocapitalize="words"/>
+      <input class="finp" id="rg-pass" type="password" placeholder="Пин-код (6 цифр)" autocomplete="new-password" inputmode="numeric" maxlength="6"/>
+      <div class="login-err" id="rg-err"></div>
+      <button class="btn-primary" id="rg-btn">Создать аккаунт</button>
+      <div class="login-switch">Уже есть? <span id="go-li">Войти</span></div>
+    </div>
+  </div>
 
   <!-- LOCK -->
-  <div id="lock">
+  <div class="screen off-right" id="s-lock">
     <div class="lk-time" id="lk-time">00:00</div>
     <div class="lk-date" id="lk-date"></div>
-    <div class="lk-logo"><span class="lk-letter">D</span></div>
-    <div class="lk-name">Deonats</div>
-    <div class="lk-hint" id="lk-hint">Введите код-пароль</div>
+    <div class="lk-user">Добро пожаловать,</div>
+    <div class="lk-name" id="lk-name"></div>
+    <div class="lk-hint" id="lk-hint">Введите пин-код</div>
     <div class="pin-dots" id="pin-dots"></div>
     <div class="pin-grid" id="pin-grid"></div>
+    <div class="lk-logout" id="lk-logout">Сменить пользователя</div>
   </div>
 
   <!-- MAIN -->
-  <div id="main">
+  <div class="screen off-right" id="s-main">
     <header>
       <div class="logo">Deonats</div>
       <div class="hdr-r" id="hdr-r"></div>
     </header>
     <div class="scroll" id="scroll"></div>
-    <button class="fab" id="fab"></button>
+    <button class="fab" id="fab">
+      <span class="fab-plus">+</span>
+      <span id="fab-lbl">Добавить</span>
+    </button>
   </div>
 
-  <div class="overlay" id="overlay">
-    <div class="modal" id="modal"></div>
+  <!-- BOTTOM SHEETS -->
+  <div class="overlay" id="ov-tx">
+    <div class="sheet" id="sh-tx"></div>
+  </div>
+  <div class="overlay" id="ov-goal">
+    <div class="sheet" id="sh-goal"></div>
   </div>
 
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════
-const PIN = "170117";
-const CURRENCIES = {
-  KZT:{sym:"₸",rate:1},
-  RUB:{sym:"₽",rate:0.21},
-  USD:{sym:"$",rate:0.00218}
+// ═══════════════════════════════════════════════════════
+// STORAGE HELPERS
+// ═══════════════════════════════════════════════════════
+const DB = {
+  get(k){ try{return JSON.parse(localStorage.getItem(k))}catch{return null} },
+  set(k,v){ localStorage.setItem(k,JSON.stringify(v)) },
+  del(k){ localStorage.removeItem(k) }
 };
-const I18N = {
-  ru:{balance:"Общий баланс",income:"Доходы",expenses:"Расходы",goals:"Цели",
-      transactions:"Транзакции",seeAll:"Все",addTx:"Добавить транзакцию",
-      category:"Категория",amount:"Сумма",description:"Описание",add:"Добавить",
-      typeIncome:"Доход",typeExpense:"Расход",saved:"Добавлено ✓",
-      noTx:"Транзакций пока нет",left:"осталось",until:"до"},
-  en:{balance:"Total Balance",income:"Income",expenses:"Expenses",goals:"Goals",
-      transactions:"Transactions",seeAll:"All",addTx:"Add Transaction",
-      category:"Category",amount:"Amount",description:"Description",add:"Add",
-      typeIncome:"Income",typeExpense:"Expense",saved:"Added ✓",
-      noTx:"No transactions yet",left:"left",until:"until"}
+function getUsers(){ return DB.get('dn_users') || {} }
+function saveUsers(u){ DB.set('dn_users',u) }
+function getUserData(uid){ return DB.get('dn_data_'+uid) || {tx:[],goals:[]} }
+function saveUserData(uid,d){ DB.set('dn_data_'+uid,d) }
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let APP = {
+  uid: null, displayName: null,
+  lang: 'ru', theme: 'dark', cur: 'KZT',
+  txType: 'expense', txCat: 'food',
+  goalColor: 'g', data: {tx:[],goals:[]}
+};
+
+// ═══════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════
+const CUR = {KZT:{s:'₸',r:1},RUB:{s:'₽',r:0.21},USD:{s:'$',r:0.00218}};
+const I18 = {
+  ru:{balance:'Общий баланс',income:'Доходы',expenses:'Расходы',goals:'Сберегательные цели',
+      transactions:'Транзакции',addTx:'Добавить транзакцию',addGoal:'Новая цель',
+      cat:'Категория',amt:'Сумма',desc:'Описание',add:'Добавить',
+      inc:'Доход',exp:'Расход',saved:'Добавлено ✓',noTx:'Транзакций пока нет.\nНажмите + чтобы добавить',
+      left:'осталось',until:'до',goalName:'Название цели',goalTarget:'Целевая сумма',
+      goalDeadline:'Дата (ГГГГ-ММ-ДД)',addGoalBtn:'Добавить цель',logout:'Выйти'},
+  en:{balance:'Total Balance',income:'Income',expenses:'Expenses',goals:'Savings Goals',
+      transactions:'Transactions',addTx:'Add Transaction',addGoal:'New Goal',
+      cat:'Category',amt:'Amount',desc:'Description',add:'Add',
+      inc:'Income',exp:'Expense',saved:'Added ✓',noTx:'No transactions yet.\nTap + to add one',
+      left:'left',until:'until',goalName:'Goal name',goalTarget:'Target amount',
+      goalDeadline:'Date (YYYY-MM-DD)',addGoalBtn:'Add Goal',logout:'Sign out'}
 };
 const CATS = {
-  ru:[{id:"food",l:"Еда",i:"🍔"},{id:"transport",l:"Транспорт",i:"🚇"},
-      {id:"entertainment",l:"Развлечения",i:"🎮"},{id:"shopping",l:"Покупки",i:"🛍️"},
-      {id:"salary",l:"Зарплата",i:"💼"},{id:"other",l:"Другое",i:"💡"}],
-  en:[{id:"food",l:"Food",i:"🍔"},{id:"transport",l:"Transport",i:"🚇"},
-      {id:"entertainment",l:"Entertainment",i:"🎮"},{id:"shopping",l:"Shopping",i:"🛍️"},
-      {id:"salary",l:"Salary",i:"💼"},{id:"other",l:"Other",i:"💡"}]
+  ru:[{id:'food',l:'Еда',i:'🍔'},{id:'transport',l:'Транспорт',i:'🚇'},
+      {id:'entertainment',l:'Развлечения',i:'🎮'},{id:'shopping',l:'Покупки',i:'🛍️'},
+      {id:'salary',l:'Зарплата',i:'💼'},{id:'health',l:'Здоровье',i:'💊'},
+      {id:'home',l:'ЖКУ',i:'🏠'},{id:'other',l:'Другое',i:'💡'}],
+  en:[{id:'food',l:'Food',i:'🍔'},{id:'transport',l:'Transport',i:'🚇'},
+      {id:'entertainment',l:'Entertainment',i:'🎮'},{id:'shopping',l:'Shopping',i:'🛍️'},
+      {id:'salary',l:'Salary',i:'💼'},{id:'health',l:'Health',i:'💊'},
+      {id:'home',l:'Housing',i:'🏠'},{id:'other',l:'Other',i:'💡'}]
 };
-const GOALS_DATA = [
-  {id:1,name:"MacBook Pro",icon:"💻",current:250000,target:550000,deadline:"2025-12-31",color:"g"},
-  {id:2,name:"Отпуск / Таиланд",icon:"✈️",current:130000,target:400000,deadline:"2026-03-01",color:"gold"},
-  {id:3,name:"Резервный фонд",icon:"🛡️",current:580000,target:1000000,deadline:"2026-12-31",color:"b"}
-];
-let TX = [
-  {id:1,name:"Зарплата",cat:"salary",i:"💼",amt:450000,type:"income",date:"23 мая"},
-  {id:2,name:"Продукты",cat:"food",i:"🍔",amt:-8400,type:"expense",date:"22 мая"},
-  {id:3,name:"Метро",cat:"transport",i:"🚇",amt:-1600,type:"expense",date:"22 мая"},
-  {id:4,name:"Кинотеатр",cat:"entertainment",i:"🎮",amt:-4200,type:"expense",date:"21 мая"},
-  {id:5,name:"Фриланс",cat:"other",i:"💡",amt:85000,type:"income",date:"20 мая"},
-  {id:6,name:"Одежда",cat:"shopping",i:"🛍️",amt:-18500,type:"expense",date:"19 мая"}
-];
-let state = {theme:"dark",lang:"ru",cur:"KZT",modalOpen:false,modalType:"expense",modalCat:"food"};
+const GOAL_COLORS = [{k:'g',c:'#30d158'},{k:'gold',c:'#ffd60a'},{k:'b',c:'#0a84ff'},{k:'p',c:'#bf5af2'},{k:'r',c:'#ff453a'}];
+const KSUBS = {'2':'ABC','3':'DEF','4':'GHI','5':'JKL','6':'MNO','7':'PQRS','8':'TUV','9':'WXYZ'};
 
-// ═══════════════════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════════════════
-function fmtAmt(kzt, curKey) {
-  const c = CURRENCIES[curKey], v = kzt * c.rate;
-  const abs = Math.abs(v);
-  if(abs >= 1000000) return (v/1000000).toFixed(1)+"M";
-  if(abs >= 1000) return Math.round(v).toLocaleString("ru-RU");
-  if(abs < 1 && abs > 0) return v.toFixed(2);
-  return Math.round(v).toLocaleString("ru-RU");
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function el(id){return document.getElementById(id)}
+function ce(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+function t(k){return I18[APP.lang][k]||k}
+function s(){return CUR[APP.cur].s}
+function fmt(kzt){
+  const v=kzt*CUR[APP.cur].r, abs=Math.abs(v);
+  if(abs>=1e6)return (v/1e6).toFixed(1)+'M';
+  if(abs>=1000)return Math.round(v).toLocaleString('ru-RU');
+  if(abs<1&&abs>0)return v.toFixed(2);
+  return Math.round(v).toLocaleString('ru-RU');
 }
-function t(k){ return I18N[state.lang][k] || k; }
-function sym(){ return CURRENCIES[state.cur].sym; }
-function el(id){ return document.getElementById(id); }
-function ce(tag,cls,html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
-
-function showToast(msg){
-  const el = document.getElementById("toast");
-  el.textContent = msg; el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"), 2200);
+function toast(msg){
+  const e=el('toast');e.textContent=msg;e.classList.add('show');
+  clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200);
 }
-
-// ═══════════════════════════════════════════════════════════
-//  LOCK
-// ═══════════════════════════════════════════════════════════
-let pinBuf = "";
-
-(function buildLock(){
-  // clock
-  function tick(){
-    const now = new Date();
-    const h=String(now.getHours()).padStart(2,"0"), m=String(now.getMinutes()).padStart(2,"0");
-    el("lk-time").textContent = h+":"+m;
-    const days=["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"];
-    const months=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
-    el("lk-date").textContent = days[now.getDay()]+", "+now.getDate()+" "+months[now.getMonth()];
-  }
-  tick(); setInterval(tick, 10000);
-
-  // dots
-  const dotsW = el("pin-dots");
-  for(let i=0;i<6;i++){
-    const d = document.createElement("div");
-    d.className = "pin-dot"; d.id = "pd"+i;
-    dotsW.appendChild(d);
-  }
-
-  // grid
-  const grid = el("pin-grid");
-  const keys = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
-  const subs = {"2":"ABC","3":"DEF","4":"GHI","5":"JKL","6":"MNO","7":"PQRS","8":"TUV","9":"WXYZ"};
-  keys.forEach(k => {
-    const btn = document.createElement("button");
-    btn.className = "pk" + (k===""?" ghost":k==="⌫"?" del":"");
-    if(k==="⌫"){
-      btn.innerHTML = `<svg width="22" height="16" viewBox="0 0 22 16" fill="none"><path d="M8 1L1 8L8 15M1 8H21" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 2H9L4 8L9 14H21V2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/><path d="M14 5L18 11M18 5L14 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`;
-      btn.onclick = pinDel;
-    } else if(k!==""){
-      const sub = subs[k]||"";
-      btn.innerHTML = `<span class="pk-n">${k}</span>${sub?`<span class="pk-s">${sub}</span>`:""}`;
-      btn.onclick = ()=>pinPress(k);
-    }
-    grid.appendChild(btn);
+function showScreen(id){
+  ['s-login','s-lock','s-main'].forEach(sid=>{
+    const sc=el(sid);
+    if(sid===id){sc.className='screen';sc.style.zIndex=10}
+    else{sc.className='screen off-right';sc.style.zIndex=1}
   });
-})();
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGIN / REGISTER
+// ═══════════════════════════════════════════════════════
+let loginMode = true;
+
+function initLoginScreen(){
+  el('li-err').textContent='';
+  el('rg-err').textContent='';
+  if(loginMode){
+    el('login-form').style.display='flex';
+    el('reg-form').style.display='none';
+  } else {
+    el('login-form').style.display='none';
+    el('reg-form').style.display='flex';
+  }
+}
+
+el('go-reg').onclick=()=>{loginMode=false;initLoginScreen()};
+el('go-li').onclick=()=>{loginMode=true;initLoginScreen()};
+
+el('li-btn').onclick=()=>{
+  const u=el('li-user').value.trim().toLowerCase();
+  const p=el('li-pass').value.trim();
+  if(!u||!p){el('li-err').textContent='Заполните все поля';return}
+  const users=getUsers();
+  if(!users[u]){el('li-err').textContent='Пользователь не найден';return}
+  if(users[u].pin!==p){el('li-err').textContent='Неверный пин-код';return}
+  APP.uid=u; APP.displayName=users[u].name;
+  DB.set('dn_session',{uid:u,name:users[u].name});
+  APP.data=getUserData(u);
+  goToLock();
+};
+
+el('rg-btn').onclick=()=>{
+  const u=el('rg-user').value.trim().toLowerCase();
+  const name=el('rg-disp').value.trim();
+  const p=el('rg-pass').value.trim();
+  if(!u||!name||!p){el('rg-err').textContent='Заполните все поля';return}
+  if(!/^\d{6}$/.test(p)){el('rg-err').textContent='Пин-код: ровно 6 цифр';return}
+  if(!/^[a-z0-9_]{3,20}$/.test(u)){el('rg-err').textContent='Логин: 3-20 символов, латиница';return}
+  const users=getUsers();
+  if(users[u]){el('rg-err').textContent='Такой логин уже занят';return}
+  users[u]={pin:p,name};
+  saveUsers(users);
+  APP.uid=u; APP.displayName=name;
+  DB.set('dn_session',{uid:u,name});
+  APP.data={tx:[],goals:[]};
+  saveUserData(u,APP.data);
+  loginMode=true; initLoginScreen();
+  toast('Аккаунт создан! Войдите');
+};
+
+// Enter key support
+[el('li-user'),el('li-pass')].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')el('li-btn').click()}));
+[el('rg-user'),el('rg-disp'),el('rg-pass')].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')el('rg-btn').click()}));
+
+// ═══════════════════════════════════════════════════════
+// LOCK SCREEN (PIN)
+// ═══════════════════════════════════════════════════════
+let pinBuf='';
+
+function buildLock(){
+  // dots
+  const dw=el('pin-dots'); dw.innerHTML='';
+  for(let i=0;i<6;i++){const d=ce('div','pin-dot');d.id='pd'+i;dw.appendChild(d)}
+  // grid
+  const gw=el('pin-grid'); gw.innerHTML='';
+  ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{
+    const b=ce('button','pk'+(k===''?' ghost':k==='⌫'?' del':''));
+    if(k==='⌫'){
+      b.innerHTML=`<svg width="22" height="16" viewBox="0 0 22 16" fill="none"><path d="M8 1L1 8L8 15" stroke="white" stroke-width="1.8" stroke-linecap="round"/><path d="M21 2H9L4 8L9 14H21V2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/><path d="M14 5L18 11M18 5L14 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+      b.onclick=pinDel;
+    } else if(k!==''){
+      b.innerHTML=`<span class="pk-n">${k}</span>${KSUBS[k]?`<span class="pk-s">${KSUBS[k]}</span>`:''}`;
+      b.onclick=()=>pinTap(k);
+    }
+    gw.appendChild(b);
+  });
+  // logout
+  el('lk-logout').onclick=()=>{DB.del('dn_session');APP.uid=null;showScreen('s-login')};
+}
+
+function clockTick(){
+  const n=new Date();
+  const h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0');
+  el('lk-time').textContent=h+':'+m;
+  const days=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  const months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  el('lk-date').textContent=days[n.getDay()]+', '+n.getDate()+' '+months[n.getMonth()];
+}
+
+function goToLock(){
+  el('lk-name').textContent=APP.displayName;
+  pinBuf=''; updateDots();
+  clockTick(); clearInterval(window._clk); window._clk=setInterval(clockTick,10000);
+  showScreen('s-lock');
+}
 
 function updateDots(){
   for(let i=0;i<6;i++){
-    const d=el("pd"+i);
-    d.classList.toggle("on", i<pinBuf.length);
-    d.classList.remove("err");
+    const d=el('pd'+i);
+    d.classList.toggle('on',i<pinBuf.length);
+    d.classList.remove('err');
   }
 }
 
-function pinPress(digit){
-  if(pinBuf.length>=6) return;
+function pinTap(digit){
+  if(pinBuf.length>=6)return;
   pinBuf+=digit; updateDots();
   if(pinBuf.length===6){
     setTimeout(()=>{
-      if(pinBuf===PIN){
-        el("lock").classList.add("out");
-        el("main").classList.add("show");
-        setTimeout(()=>{ el("lock").style.display="none"; renderApp(); }, 700);
+      const users=getUsers();
+      if(users[APP.uid]&&users[APP.uid].pin===pinBuf){
+        pinBuf=''; goToMain();
       } else {
-        for(let i=0;i<6;i++) el("pd"+i).classList.add("err");
-        const hint = el("lk-hint");
-        hint.textContent="Неверный код"; hint.classList.add("err");
-        setTimeout(()=>{ pinBuf=""; updateDots(); hint.textContent="Введите код-пароль"; hint.classList.remove("err"); }, 700);
+        for(let i=0;i<6;i++) el('pd'+i).classList.add('err');
+        const h=el('lk-hint'); h.textContent='Неверный пин-код'; h.classList.add('err');
+        setTimeout(()=>{pinBuf='';updateDots();h.textContent='Введите пин-код';h.classList.remove('err')},700);
       }
     },80);
   }
 }
-function pinDel(){ if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1); updateDots();} }
+function pinDel(){if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1);updateDots()}}
 
-// ═══════════════════════════════════════════════════════════
-//  RENDER APP
-// ═══════════════════════════════════════════════════════════
-function renderApp(){
+// ═══════════════════════════════════════════════════════
+// MAIN SCREEN
+// ═══════════════════════════════════════════════════════
+function goToMain(){
+  APP.data=getUserData(APP.uid);
+  showScreen('s-main');
+  renderMain();
+}
+
+function save(){saveUserData(APP.uid,APP.data)}
+
+function renderMain(){
   renderHeader();
   renderScroll();
-  renderFab();
+  el('fab-lbl').textContent=t('addTx');
+  el('fab').onclick=openTxSheet;
 }
 
 function renderHeader(){
-  const r = el("hdr-r"); r.innerHTML="";
-  ["ru","en"].forEach(l=>{
-    const b = ce("button","ibtn "+(state.lang===l?"on":"off"),l.toUpperCase());
-    b.onclick=()=>{ state.lang=l; renderApp(); };
+  const r=el('hdr-r'); r.innerHTML='';
+  ['ru','en'].forEach(l=>{
+    const b=ce('button','ibtn'+(APP.lang===l?'':' dim'),l.toUpperCase());
+    b.onclick=()=>{APP.lang=l;renderMain()};
     r.appendChild(b);
   });
-  const tb = ce("button","ibtn", state.theme==="dark"?"☀️":"🌙");
+  const tb=ce('button','ibtn',APP.theme==='dark'?'☀️':'🌙');
+  tb.style.padding='0';tb.style.width='34px';
   tb.onclick=()=>{
-    state.theme = state.theme==="dark"?"light":"dark";
-    document.body.className = state.theme==="light"?"light":"";
-    renderApp();
+    APP.theme=APP.theme==='dark'?'light':'dark';
+    document.body.className=APP.theme==='light'?'light':'';
+    renderMain();
   };
   r.appendChild(tb);
+  const lo=ce('button','ibtn dim',t('logout'));
+  lo.onclick=()=>{DB.del('dn_session');APP.uid=null;showScreen('s-login')};
+  r.appendChild(lo);
 }
 
 function renderScroll(){
-  const sc = el("scroll"); sc.innerHTML="";
+  const sc=el('scroll'); sc.innerHTML='';
 
-  // Currency switcher
-  const cw = ce("div","cur-wrap");
-  Object.keys(CURRENCIES).forEach(k=>{
-    const b = ce("button","cur-btn"+(state.cur===k?" on":""), CURRENCIES[k].sym+" "+k);
-    b.onclick=()=>{ state.cur=k; renderScroll(); };
+  // Currency
+  const cw=ce('div','cur-wrap');
+  Object.keys(CUR).forEach(k=>{
+    const b=ce('button','cur-btn'+(APP.cur===k?' on':''),CUR[k].s+' '+k);
+    b.onclick=()=>{APP.cur=k;renderScroll()};
     cw.appendChild(b);
   });
   sc.appendChild(cw);
 
-  // Balance card
-  const income  = TX.filter(x=>x.amt>0).reduce((s,x)=>s+x.amt,0);
-  const expense = TX.filter(x=>x.amt<0).reduce((s,x)=>s+Math.abs(x.amt),0);
-  const bal     = income - expense;
-  const bc = ce("div","bal-card");
-  bc.innerHTML = `
-    <div class="bal-lbl">${t("balance")}</div>
-    <div class="bal-num"><span class="bal-cur">${sym()}</span><span>${fmtAmt(bal,state.cur)}</span></div>
+  // Balance
+  const txs=APP.data.tx;
+  const inc=txs.filter(x=>x.amt>0).reduce((a,x)=>a+x.amt,0);
+  const exp=txs.filter(x=>x.amt<0).reduce((a,x)=>a+Math.abs(x.amt),0);
+  const bal=inc-exp;
+  const bc=ce('div','bal-card');
+  bc.innerHTML=`
+    <div class="bal-lbl">${t('balance')}</div>
+    <div class="bal-num"><span class="bal-sym">${s()}</span><span>${fmt(bal)}</span></div>
     <div class="bal-row">
-      <div class="bstat"><div class="bstat-l">${t("income")}</div><div class="bstat-v clr-g">${sym()}${fmtAmt(income,state.cur)}</div></div>
-      <div class="bstat"><div class="bstat-l">${t("expenses")}</div><div class="bstat-v clr-r">${sym()}${fmtAmt(expense,state.cur)}</div></div>
+      <div class="bst"><div class="bst-l">${t('income')}</div><div class="bst-v clg">${s()}${fmt(inc)}</div></div>
+      <div class="bst"><div class="bst-l">${t('expenses')}</div><div class="bst-v clr">${s()}${fmt(exp)}</div></div>
     </div>`;
   sc.appendChild(bc);
 
   // Goals
-  const gh = ce("div");
-  gh.innerHTML = `<div class="sec-hdr"><div class="sec-ttl">${t("goals")}</div></div>`;
-  const gl = ce("div","goals");
-  GOALS_DATA.forEach((g,i)=>{
-    const pct = Math.min(100,Math.round(g.current/g.target*100));
-    const d = new Date(g.deadline);
-    const ds = d.toLocaleDateString(state.lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short",year:"numeric"});
-    const left = g.target - g.current;
-    const gc = ce("div","gcard s"+(i+1));
-    gc.innerHTML = `
-      <div class="gcard-top">
-        <div><div class="gico">${g.icon}</div><div class="gname">${g.name}</div><div class="gdl">${t("until")} ${ds}</div></div>
-        <div><div class="gamt">${sym()}${fmtAmt(g.current,state.cur)}</div><div class="gtgt">${state.lang==="ru"?"из":"of"} ${sym()}${fmtAmt(g.target,state.cur)}</div></div>
+  const gh=ce('div');
+  const ghdr=ce('div','sec-h');
+  ghdr.innerHTML=`<div class="sec-t">${t('goals')}</div>`;
+  gh.appendChild(ghdr);
+  const gl=ce('div','goals');
+  APP.data.goals.forEach((g,i)=>{
+    const pct=Math.min(100,Math.round(g.current/g.target*100));
+    const dleft=g.target-g.current;
+    let ds='';
+    if(g.deadline){const d=new Date(g.deadline);if(!isNaN(d))ds=d.toLocaleDateString(APP.lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',year:'numeric'})}
+    const gc=ce('div','gc s'+Math.min(i+1,6));
+    gc.innerHTML=`
+      <div class="gc-top">
+        <div><div class="gc-ico">${g.icon||'🎯'}</div><div class="gc-n">${g.name}</div>${ds?`<div class="gc-dl">${t('until')} ${ds}</div>`:''}</div>
+        <div><div class="gc-a">${s()}${fmt(g.current)}</div><div class="gc-tg">${APP.lang==='ru'?'из':'of'} ${s()}${fmt(g.target)}</div></div>
       </div>
-      <div class="ptrack"><div class="pfill ${g.color}" style="width:${pct}%"></div></div>
-      <div class="gfoot"><div class="gpct">${pct}%</div><div class="gpct">${sym()}${fmtAmt(left,state.cur)} ${t("left")}</div></div>`;
+      <div class="ptr"><div class="pf ${g.color||'g'}" style="width:${pct}%"></div></div>
+      <div class="gc-ft"><div class="gc-pc">${pct}%</div><div class="gc-pc">${s()}${fmt(dleft)} ${t('left')}</div></div>`;
     gl.appendChild(gc);
   });
+  // add goal card
+  const ag=ce('div','add-card');
+  ag.innerHTML=`<span style="font-size:20px;color:var(--fg3)">＋</span><span class="add-card-t">${t('addGoal')}</span>`;
+  ag.onclick=openGoalSheet;
+  gl.appendChild(ag);
   gh.appendChild(gl);
   sc.appendChild(gh);
 
   // Transactions
-  const th = ce("div");
-  th.innerHTML = `<div class="sec-hdr"><div class="sec-ttl">${t("transactions")}</div><div class="sec-lnk">${t("seeAll")}</div></div>`;
-  if(TX.length===0){
-    th.appendChild(ce("div","empty",t("noTx")));
+  const th=ce('div');
+  const thdr=ce('div','sec-h');
+  thdr.innerHTML=`<div class="sec-t">${t('transactions')}</div>`;
+  th.appendChild(thdr);
+  if(txs.length===0){
+    const em=ce('div','empty'); em.style.whiteSpace='pre-line'; em.textContent=t('noTx');
+    th.appendChild(em);
   } else {
-    const tl = ce("div","tx-list");
-    TX.slice(0,6).forEach((tx,i)=>{
-      const pos = tx.amt>0;
-      const item = ce("div","tx-item s"+Math.min(i+1,6));
-      item.innerHTML = `
-        <div class="tx-ico">${tx.i}</div>
-        <div class="tx-info"><div class="tx-name">${tx.name}</div><div class="tx-date">${tx.date}</div></div>
-        <div class="tx-amt" style="color:${pos?"var(--green)":"var(--fg)"}">${pos?"+":"−"}${sym()}${fmtAmt(Math.abs(tx.amt),state.cur)}</div>`;
+    const tl=ce('div','tx-list');
+    txs.slice(0,20).forEach((tx,i)=>{
+      const pos=tx.amt>0;
+      const item=ce('div','tx-item s'+Math.min(i+1,6));
+      item.innerHTML=`
+        <div class="tx-ico">${tx.icon||'💡'}</div>
+        <div class="tx-info"><div class="tx-n">${tx.name}</div><div class="tx-d">${tx.date}</div></div>
+        <div class="tx-a" style="color:${pos?'var(--green)':'var(--fg)'}">${pos?'+':'−'}${s()}${fmt(Math.abs(tx.amt))}</div>`;
       tl.appendChild(item);
-      if(i < Math.min(TX.length,6)-1) tl.appendChild(ce("div","tx-sep"));
+      if(i<Math.min(txs.length,20)-1) tl.appendChild(ce('div','tx-sep'));
     });
     th.appendChild(tl);
   }
   sc.appendChild(th);
 }
 
-function renderFab(){
-  const f = el("fab"); f.innerHTML="";
-  const plus = ce("span","fab-plus","+");
-  f.appendChild(plus);
-  f.appendChild(document.createTextNode(t("addTx")));
-  f.onclick = openModal;
-}
-
-// ═══════════════════════════════════════════════════════════
-//  MODAL
-// ═══════════════════════════════════════════════════════════
-function openModal(){
-  state.modalOpen=true; state.modalType="expense"; state.modalCat="food";
-  renderModal();
-  el("overlay").classList.add("open");
-}
-function closeModal(){
-  el("overlay").classList.remove("open");
-}
-el("overlay").addEventListener("click", e=>{ if(e.target===el("overlay")) closeModal(); });
-
-function renderModal(){
-  const cats = CATS[state.lang];
-  const curSym = CURRENCIES[state.cur].sym;
-  const m = el("modal");
-  m.innerHTML = `
-    <div class="mhandle"></div>
-    <div class="mttl">${t("addTx")}</div>
+// ═══════════════════════════════════════════════════════
+// TX SHEET
+// ═══════════════════════════════════════════════════════
+function openTxSheet(){
+  const sh=el('sh-tx');
+  const cats=CATS[APP.lang];
+  sh.innerHTML=`
+    <div class="sh-handle"></div>
+    <div class="sh-title">${t('addTx')}</div>
     <div class="mtabs">
-      <button class="mtab${state.modalType==="expense"?" on":""}" id="mtab-exp">${t("typeExpense")}</button>
-      <button class="mtab${state.modalType==="income"?" on":""}" id="mtab-inc">${t("typeIncome")}</button>
+      <button class="mtab${APP.txType==='expense'?' on':''}" id="tb-exp">${t('exp')}</button>
+      <button class="mtab${APP.txType==='income'?' on':''}" id="tb-inc">${t('inc')}</button>
     </div>
-    <label class="flbl">${t("amount")} (${curSym})</label>
-    <input class="finp" id="minp-amt" type="number" inputmode="decimal" placeholder="0" />
-    <label class="flbl">${t("category")}</label>
-    <select class="finp fsel" id="minp-cat">
-      ${cats.map(c=>`<option value="${c.id}"${state.modalCat===c.id?" selected":""}>${c.i} ${c.l}</option>`).join("")}
-    </select>
-    <label class="flbl">${t("description")}</label>
-    <input class="finp" id="minp-desc" type="text" placeholder="${t("description")}" />
-    <button class="sbtn" id="msubmit">${t("add")}</button>`;
+    <div class="fg"><label class="flbl">${t('amt')} (${CUR[APP.cur].s})</label>
+    <input class="finp" id="tx-amt" type="number" inputmode="decimal" placeholder="0"/></div>
+    <div class="fg"><label class="flbl">${t('cat')}</label>
+    <select class="finp fsel" id="tx-cat">
+      ${cats.map(c=>`<option value="${c.id}"${APP.txCat===c.id?' selected':''}>${c.i} ${c.l}</option>`).join('')}
+    </select></div>
+    <div class="fg"><label class="flbl">${t('desc')}</label>
+    <input class="finp" id="tx-desc" type="text" placeholder="${t('desc')}"/></div>
+    <button class="sbtn" id="tx-sub">${t('add')}</button>`;
 
-  el("mtab-exp").onclick = ()=>{ state.modalType="expense"; renderModal(); };
-  el("mtab-inc").onclick = ()=>{ state.modalType="income";  renderModal(); };
-  el("minp-cat").onchange = e=>{ state.modalCat=e.target.value; };
-  el("msubmit").onclick = ()=>{
-    const rawAmt = parseFloat((el("minp-amt").value||"0").replace(",","."));
-    if(isNaN(rawAmt)||rawAmt<=0) return;
-    const kztAmt = rawAmt / CURRENCIES[state.cur].rate;
-    const cat    = cats.find(c=>c.id===state.modalCat);
-    const desc   = el("minp-desc").value.trim();
-    const now    = new Date();
-    const dateStr = now.toLocaleDateString(state.lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short"});
-    TX.unshift({
-      id:Date.now(), name:desc||cat.l, cat:cat.id, i:cat.i,
-      amt: state.modalType==="income" ? kztAmt : -kztAmt,
-      type:state.modalType, date:dateStr
+  el('tb-exp').onclick=()=>{APP.txType='expense';openTxSheet()};
+  el('tb-inc').onclick=()=>{APP.txType='income';openTxSheet()};
+  el('tx-cat').onchange=e=>{APP.txCat=e.target.value};
+  el('tx-sub').onclick=()=>{
+    const raw=parseFloat((el('tx-amt').value||'0').replace(',','.'));
+    if(isNaN(raw)||raw<=0)return;
+    const kzt=raw/CUR[APP.cur].r;
+    const cat=cats.find(c=>c.id===(el('tx-cat').value||APP.txCat));
+    const desc=el('tx-desc').value.trim();
+    const now=new Date();
+    const ds=now.toLocaleDateString(APP.lang==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short'});
+    APP.data.tx.unshift({
+      id:Date.now(), name:desc||cat.l, cat:cat.id, icon:cat.i,
+      amt:APP.txType==='income'?kzt:-kzt,
+      type:APP.txType, date:ds
     });
-    closeModal();
-    showToast(t("saved"));
+    save();
+    closeOverlay('ov-tx');
+    toast(t('saved'));
     renderScroll();
-    renderFab();
   };
+  el('ov-tx').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// GOAL SHEET
+// ═══════════════════════════════════════════════════════
+function openGoalSheet(){
+  const sh=el('sh-goal');
+  const icons=['🎯','💻','✈️','🏠','🚗','📱','🎓','🛡️','💍','🌍'];
+  let selIcon='🎯';
+  sh.innerHTML=`
+    <div class="sh-handle"></div>
+    <div class="sh-title">${t('addGoal')}</div>
+    <div class="fg"><label class="flbl">${t('goalName')}</label>
+    <input class="finp" id="gl-name" type="text" placeholder="${t('goalName')}"/></div>
+    <div class="fg" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="icon-row">
+      ${icons.map(ic=>`<button onclick="selIcon=this.textContent;document.querySelectorAll('.ico-btn').forEach(b=>b.style.background='var(--card2)');this.style.background='var(--card3)'" class="ico-btn" style="font-size:22px;background:var(--card2);border:none;border-radius:10px;width:40px;height:40px;cursor:pointer">${ic}</button>`).join('')}
+    </div>
+    <div class="fg"><label class="flbl">${t('goalTarget')} (${CUR[APP.cur].s})</label>
+    <input class="finp" id="gl-tgt" type="number" inputmode="decimal" placeholder="0"/></div>
+    <div class="fg"><label class="flbl">${t('goalTarget')} — текущая сумма (${CUR[APP.cur].s})</label>
+    <input class="finp" id="gl-cur" type="number" inputmode="decimal" placeholder="0"/></div>
+    <div class="fg"><label class="flbl">${t('goalDeadline')}</label>
+    <input class="finp" id="gl-dl" type="text" placeholder="2026-12-31"/></div>
+    <div class="fg"><label class="flbl">Цвет</label>
+    <div class="goal-color-row" id="gc-colors">
+      ${GOAL_COLORS.map(gc=>`<div class="gc-dot${APP.goalColor===gc.k?' on':''}" data-k="${gc.k}" style="background:${gc.c}" onclick="APP.goalColor='${gc.k}';document.querySelectorAll('.gc-dot').forEach(d=>{d.classList.toggle('on',d.dataset.k==='${gc.k}')})"></div>`).join('')}
+    </div></div>
+    <button class="sbtn" id="gl-sub">${t('addGoalBtn')}</button>`;
+
+  el('gl-sub').onclick=()=>{
+    const name=el('gl-name').value.trim();
+    const tgt=parseFloat((el('gl-tgt').value||'0').replace(',','.'));
+    const cur=parseFloat((el('gl-cur').value||'0').replace(',','.'));
+    const dl=el('gl-dl').value.trim();
+    if(!name||isNaN(tgt)||tgt<=0)return;
+    const kztTgt=tgt/CUR[APP.cur].r;
+    const kztCur=isNaN(cur)?0:cur/CUR[APP.cur].r;
+    const selIconEl=document.querySelector('.ico-btn[style*="card3"]');
+    const icon=selIconEl?selIconEl.textContent:'🎯';
+    APP.data.goals.push({id:Date.now(),name,icon,current:kztCur,target:kztTgt,deadline:dl,color:APP.goalColor});
+    save();
+    closeOverlay('ov-goal');
+    toast(t('saved'));
+    renderScroll();
+  };
+  el('ov-goal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════
+// OVERLAY CLOSE
+// ═══════════════════════════════════════════════════════
+function closeOverlay(id){el(id).classList.remove('open')}
+el('ov-tx').addEventListener('click',e=>{if(e.target===el('ov-tx'))closeOverlay('ov-tx')});
+el('ov-goal').addEventListener('click',e=>{if(e.target===el('ov-goal'))closeOverlay('ov-goal')});
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+buildLock();
+initLoginScreen();
+
+// Check existing session
+const sess=DB.get('dn_session');
+if(sess&&sess.uid){
+  const users=getUsers();
+  if(users[sess.uid]){
+    APP.uid=sess.uid; APP.displayName=sess.name;
+    APP.data=getUserData(sess.uid);
+    goToLock();
+  }
 }
 </script>
 </body>
