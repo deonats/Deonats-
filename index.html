@@ -2,7 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Deonats</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -10,246 +12,618 @@
     :root {
       --bg: #000000;
       --bg2: #0D0D0D;
-      --card: #121212;
-      --card2: #1A1A1A;
-      --border: rgba(255,255,255,0.07);
+      --card: #1C1C1E;
+      --card2: #2C2C2E;
+      --card3: #3A3A3C;
+      --border: rgba(255,255,255,0.08);
       --fg: #FFFFFF;
-      --fg2: rgba(255,255,255,0.5);
-      --fg3: rgba(255,255,255,0.25);
+      --fg2: rgba(255,255,255,0.55);
+      --fg3: rgba(255,255,255,0.28);
       --accent: #FFFFFF;
-      --accent-bg: rgba(255,255,255,0.08);
-      --green: #34D399;
-      --red: #F87171;
-      --gold: #F59E0B;
-      --radius: 20px;
-      --radius-sm: 12px;
-      --shadow: 0 8px 32px rgba(0,0,0,0.4);
-      --font: 'DM Sans', sans-serif;
-      --mono: 'DM Mono', monospace;
-      --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+      --accent-bg: rgba(255,255,255,0.09);
+      --green: #30D158;
+      --red: #FF453A;
+      --gold: #FFD60A;
+      --blue: #0A84FF;
+      --purple: #BF5AF2;
+      --radius: 22px;
+      --radius-sm: 14px;
+      --radius-xs: 10px;
+      --shadow: 0 8px 40px rgba(0,0,0,0.55);
+      --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --mono: 'DM Mono', 'SF Mono', monospace;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
+      --duration: 0.38s;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bot: env(safe-area-inset-bottom, 0px);
     }
     .light {
-      --bg: #FAFAFA;
-      --bg2: #F0F0F0;
+      --bg: #F2F2F7;
+      --bg2: #E5E5EA;
       --card: #FFFFFF;
-      --card2: #F5F5F5;
+      --card2: #F2F2F7;
+      --card3: #E5E5EA;
       --border: rgba(0,0,0,0.07);
-      --fg: #0A0A0A;
-      --fg2: rgba(0,0,0,0.45);
-      --fg3: rgba(0,0,0,0.2);
-      --accent: #0A0A0A;
+      --fg: #000000;
+      --fg2: rgba(0,0,0,0.5);
+      --fg3: rgba(0,0,0,0.25);
+      --accent: #000000;
       --accent-bg: rgba(0,0,0,0.06);
-      --shadow: 0 8px 32px rgba(0,0,0,0.08);
+      --shadow: 0 8px 40px rgba(0,0,0,0.1);
     }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; background:var(--bg); font-family:var(--font); color:var(--fg); transition:background var(--transition), color var(--transition); }
-    #app { max-width:430px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; overflow-x:hidden; }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; background:var(--bg); font-family:var(--font); color:var(--fg); overflow:hidden; }
+    #app { width:100%; max-width:430px; height:100dvh; margin:0 auto; background:var(--bg); position:relative; overflow:hidden; }
 
-    /* Header */
-    header { padding:20px 24px 0; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; background:var(--bg); }
-    .logo { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
-    .header-actions { display:flex; gap:8px; align-items:center; }
-    .icon-btn { width:38px; height:38px; border-radius:50%; border:none; background:var(--accent-bg); color:var(--fg); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all var(--transition); }
-    .icon-btn:active { transform:scale(0.92); }
-    .lang-btn { font-family:var(--font); font-size:12px; font-weight:500; width:auto; padding:0 12px; border-radius:100px; letter-spacing:0.3px; color:var(--fg2); }
+    /* ─── LOCK SCREEN ─── */
+    #lock-screen {
+      position:absolute; inset:0; z-index:500;
+      background: linear-gradient(160deg, #1a1a2e 0%, #0d0d1a 50%, #0a0a14 100%);
+      display:flex; flex-direction:column; align-items:center;
+      padding-top: calc(80px + var(--safe-top));
+      transition: transform 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
+    }
+    #lock-screen.unlock-anim {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    .lock-time {
+      font-size: 76px; font-weight: 200; letter-spacing: -2px;
+      color: #fff; line-height: 1; margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .lock-date {
+      font-size: 17px; color: rgba(255,255,255,0.7); margin-bottom: 60px;
+      font-weight: 400;
+    }
+    .lock-logo-wrap {
+      width: 80px; height: 80px; border-radius: 22px;
+      background: linear-gradient(135deg, #2a2a40, #1a1a30);
+      border: 1px solid rgba(255,255,255,0.12);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    .lock-logo-letter { font-size: 36px; font-weight: 300; color: #fff; }
+    .lock-app-name { font-size: 17px; font-weight: 500; color: #fff; margin-bottom: 48px; }
+    .lock-hint { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 28px; letter-spacing: 0.2px; }
+    .pinpad { width: 280px; }
+    .pin-dots { display:flex; gap: 20px; justify-content:center; margin-bottom: 32px; }
+    .pin-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4);
+      transition: all 0.2s var(--spring);
+    }
+    .pin-dot.filled {
+      background: #fff; border-color: #fff;
+      transform: scale(1.1);
+    }
+    .pin-dot.error {
+      background: #FF453A; border-color: #FF453A;
+      animation: shake 0.4s var(--ease-out);
+    }
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    .pin-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .pin-key {
+      height: 72px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: none; color: #fff; cursor: pointer;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap: 1px;
+      transition: transform 0.15s var(--spring), background 0.1s;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .pin-key:active { transform: scale(0.88); background: rgba(255,255,255,0.22); }
+    .pin-key .pk-num { font-size: 26px; font-weight: 300; line-height: 1; }
+    .pin-key .pk-sub { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.5); text-transform:uppercase; }
+    .pin-key.pin-del, .pin-key.pin-empty { background: transparent; }
+    .pin-key.pin-del:active { background: rgba(255,255,255,0.08); transform: scale(0.88); }
+    .pin-key.pin-empty { pointer-events:none; }
+
+    /* ─── MAIN APP ─── */
+    #main-app {
+      position:absolute; inset:0; z-index:10;
+      display:flex; flex-direction:column;
+      background:var(--bg);
+      transform: scale(0.92);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.5s var(--spring), opacity 0.4s var(--ease-out);
+    }
+    #main-app.visible {
+      transform: scale(1);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      padding: calc(16px + var(--safe-top)) 20px 12px;
+      display:flex; align-items:center; justify-content:space-between;
+      background: var(--bg);
+      position: sticky; top: 0; z-index:100;
+    }
+    .logo { font-size:18px; font-weight:600; letter-spacing:-0.4px; }
+    .header-actions { display:flex; gap:6px; align-items:center; }
+    .icon-btn {
+      height: 34px; border-radius: 100px; border:none;
+      background:var(--accent-bg); color:var(--fg); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; padding: 0 12px;
+      transition: all 0.2s var(--ease-out);
+      font-family: var(--font);
+    }
+    .icon-btn:active { transform: scale(0.92); background: var(--card3); }
+    .lang-btn { font-size:12px; font-weight:600; color:var(--fg2); letter-spacing:0.4px; }
     .lang-btn.active { color:var(--fg); background:var(--accent-bg); }
 
-    /* Scroll container */
-    .scroll { padding:20px 24px 120px; display:flex; flex-direction:column; gap:28px; }
+    /* ─── SCROLL ─── */
+    .scroll {
+      flex:1; overflow-y:auto; overflow-x:hidden;
+      padding: 12px 20px calc(120px + var(--safe-bot));
+      display:flex; flex-direction:column; gap:24px;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .scroll::-webkit-scrollbar { display:none; }
 
-    /* Balance card */
-    .balance-card { background:var(--card); border-radius:var(--radius); padding:28px 28px 24px; border:1px solid var(--border); box-shadow:var(--shadow); }
-    .balance-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px; }
-    .balance-amount { font-size:42px; font-weight:300; letter-spacing:-1.5px; line-height:1; margin-bottom:20px; }
-    .balance-amount span { font-size:24px; font-weight:400; opacity:0.4; margin-right:4px; vertical-align:top; margin-top:6px; display:inline-block; }
-    .balance-row { display:flex; gap:12px; }
-    .balance-stat { flex:1; background:var(--accent-bg); border-radius:var(--radius-sm); padding:14px; }
+    /* ─── CURRENCY PILL ─── */
+    .currency-switcher {
+      display:flex; gap:6px; align-items:center;
+      background:var(--card); border-radius:100px;
+      padding: 4px; border: 1px solid var(--border);
+      align-self: flex-start;
+    }
+    .cur-btn {
+      height:30px; padding: 0 14px; border-radius:100px; border:none;
+      background:transparent; color:var(--fg2);
+      font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer;
+      transition: all 0.25s var(--spring);
+    }
+    .cur-btn.active {
+      background:var(--card2); color:var(--fg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      transform: scale(1.02);
+    }
+
+    /* ─── BALANCE CARD ─── */
+    .balance-card {
+      background:var(--card); border-radius:var(--radius);
+      padding: 24px 24px 20px;
+      border:1px solid var(--border);
+      box-shadow: var(--shadow);
+      animation: slideUp 0.5s var(--ease-out) both;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .balance-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.7px; text-transform:uppercase; margin-bottom:8px; }
+    .balance-amount {
+      font-size: clamp(36px, 9vw, 44px); font-weight:300;
+      letter-spacing:-1.5px; line-height:1; margin-bottom:20px;
+      display:flex; align-items:flex-start; gap:4px;
+    }
+    .balance-currency { font-size:22px; font-weight:400; opacity:0.45; margin-top:5px; }
+    .balance-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .balance-stat {
+      background:var(--accent-bg); border-radius:var(--radius-sm); padding:14px;
+      transition: transform 0.2s var(--spring);
+    }
+    .balance-stat:active { transform:scale(0.97); }
     .balance-stat-label { font-size:11px; color:var(--fg2); margin-bottom:5px; font-weight:500; letter-spacing:0.5px; }
-    .balance-stat-val { font-size:17px; font-weight:500; letter-spacing:-0.3px; }
+    .balance-stat-val { font-size:18px; font-weight:500; letter-spacing:-0.3px; }
     .income { color:var(--green); }
     .expense { color:var(--red); }
 
-    /* Section */
-    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-    .section-title { font-size:15px; font-weight:600; letter-spacing:-0.2px; }
-    .section-link { font-size:13px; color:var(--fg2); cursor:pointer; font-weight:500; }
+    /* ─── SECTION ─── */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .section-title { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
+    .section-link { font-size:14px; color:var(--blue); cursor:pointer; font-weight:500; }
 
-    /* Goals */
-    .goals-list { display:flex; flex-direction:column; gap:14px; }
-    .goal-card { background:var(--card); border-radius:var(--radius-sm); padding:20px; border:1px solid var(--border); }
-    .goal-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
-    .goal-name { font-size:14px; font-weight:500; }
-    .goal-deadline { font-size:11px; color:var(--fg3); margin-top:3px; }
-    .goal-amount { font-size:14px; font-weight:600; text-align:right; }
-    .goal-target { font-size:11px; color:var(--fg3); text-align:right; margin-top:2px; }
-    .progress-track { height:4px; background:var(--accent-bg); border-radius:100px; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:100px; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--fg); }
+    /* ─── GOALS ─── */
+    .goals-list { display:flex; flex-direction:column; gap:12px; }
+    .goal-card {
+      background:var(--card); border-radius:var(--radius-sm); padding:18px 20px;
+      border:1px solid var(--border);
+      animation: slideUp 0.5s var(--ease-out) both;
+      transition: transform 0.2s var(--spring);
+    }
+    .goal-card:active { transform:scale(0.98); }
+    .goal-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+    .goal-icon { width:36px; height:36px; border-radius:10px; background:var(--accent-bg); display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:6px; }
+    .goal-name { font-size:15px; font-weight:500; }
+    .goal-deadline { font-size:12px; color:var(--fg3); margin-top:2px; }
+    .goal-right { text-align:right; }
+    .goal-amount { font-size:15px; font-weight:600; }
+    .goal-target { font-size:12px; color:var(--fg3); margin-top:2px; }
+    .progress-track { height:5px; background:var(--accent-bg); border-radius:100px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:100px; transition:width 1s var(--ease-out); }
     .progress-fill.green { background:var(--green); }
     .progress-fill.gold { background:var(--gold); }
-    .goal-footer { display:flex; justify-content:space-between; margin-top:10px; }
-    .goal-pct { font-size:11px; color:var(--fg2); font-family:var(--mono); }
+    .progress-fill.blue { background:var(--blue); }
+    .goal-footer { display:flex; justify-content:space-between; margin-top:8px; }
+    .goal-pct { font-size:12px; color:var(--fg2); font-family:var(--mono); }
 
-    /* Transactions */
-    .tx-list { display:flex; flex-direction:column; gap:2px; background:var(--card); border-radius:var(--radius-sm); border:1px solid var(--border); overflow:hidden; }
-    .tx-item { display:flex; align-items:center; gap:14px; padding:16px 18px; transition:background var(--transition); cursor:pointer; }
+    /* ─── TRANSACTIONS ─── */
+    .tx-list {
+      background:var(--card); border-radius:var(--radius-sm);
+      border:1px solid var(--border); overflow:hidden;
+    }
+    .tx-item {
+      display:flex; align-items:center; gap:14px; padding:14px 18px;
+      transition: background 0.15s; cursor:pointer;
+      animation: slideUp 0.4s var(--ease-out) both;
+    }
     .tx-item:active { background:var(--accent-bg); }
-    .tx-icon { width:40px; height:40px; border-radius:12px; background:var(--accent-bg); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .tx-icon {
+      width:44px; height:44px; border-radius:14px;
+      background:var(--card2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; flex-shrink:0;
+    }
     .tx-info { flex:1; min-width:0; }
-    .tx-name { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .tx-date { font-size:12px; color:var(--fg2); margin-top:2px; }
+    .tx-name { font-size:15px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tx-date { font-size:13px; color:var(--fg2); margin-top:2px; }
     .tx-amount { font-size:15px; font-weight:600; font-family:var(--mono); flex-shrink:0; }
-    .tx-divider { height:1px; background:var(--border); margin:0 18px; }
+    .tx-sep { height:1px; background:var(--border); margin:0 18px; }
 
-    /* FAB */
-    .fab { position:fixed; bottom:32px; left:50%; transform:translateX(-50%); width:calc(100% - 48px); max-width:382px; height:58px; border-radius:100px; border:none; background:var(--fg); color:var(--bg); font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 8px 24px rgba(0,0,0,0.25); transition:all var(--transition); letter-spacing:-0.2px; z-index:200; }
-    .fab:active { transform:translateX(-50%) scale(0.97); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
-    .fab-icon { font-size:20px; font-weight:300; line-height:1; }
+    /* ─── FAB ─── */
+    .fab {
+      position:fixed;
+      bottom: calc(28px + var(--safe-bot));
+      left:50%; transform:translateX(-50%);
+      width:calc(100% - 40px); max-width:390px;
+      height:58px; border-radius:100px; border:none;
+      background:var(--fg); color:var(--bg);
+      font-family:var(--font); font-size:16px; font-weight:600;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      transition: transform 0.25s var(--spring), box-shadow 0.25s;
+      z-index:200; letter-spacing:-0.2px;
+    }
+    .fab:active { transform:translateX(-50%) scale(0.96); box-shadow:0 2px 10px rgba(0,0,0,0.2); }
+    .fab-plus { font-size:22px; font-weight:300; line-height:1; }
 
-    /* Modal */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:300; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity var(--transition); }
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      z-index:300; display:flex; align-items:flex-end; justify-content:center;
+      opacity:0; pointer-events:none;
+      transition: opacity 0.3s var(--ease-out);
+    }
     .modal-overlay.open { opacity:1; pointer-events:all; }
-    .modal { background:var(--card); border-radius:28px 28px 0 0; padding:28px 24px 48px; width:100%; max-width:430px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .modal {
+      background:var(--card); border-radius:28px 28px 0 0;
+      padding: 20px 22px calc(36px + var(--safe-bot));
+      width:100%; max-width:430px;
+      transform:translateY(110%);
+      transition:transform 0.45s var(--spring);
+      max-height:92dvh; overflow-y:auto;
+    }
     .modal-overlay.open .modal { transform:translateY(0); }
-    .modal-handle { width:36px; height:4px; background:var(--fg3); border-radius:100px; margin:0 auto 24px; }
-    .modal-title { font-size:18px; font-weight:600; letter-spacing:-0.3px; margin-bottom:24px; }
-    .modal-tabs { display:flex; background:var(--accent-bg); border-radius:12px; padding:3px; margin-bottom:20px; gap:3px; }
-    .modal-tab { flex:1; padding:10px; border-radius:9px; border:none; background:transparent; color:var(--fg2); font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; transition:all var(--transition); }
-    .modal-tab.active { background:var(--card2); color:var(--fg); box-shadow:0 2px 8px rgba(0,0,0,0.12); }
-    .form-group { margin-bottom:16px; }
-    .form-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.5px; margin-bottom:8px; display:block; text-transform:uppercase; }
-    .form-input { width:100%; background:var(--accent-bg); border:1px solid transparent; border-radius:12px; padding:14px 16px; color:var(--fg); font-family:var(--font); font-size:15px; outline:none; transition:all var(--transition); }
-    .form-input:focus { border-color:var(--fg3); background:var(--card2); }
+    .modal-handle { width:38px; height:5px; background:var(--card3); border-radius:100px; margin:0 auto 20px; }
+    .modal-title { font-size:20px; font-weight:600; letter-spacing:-0.4px; margin-bottom:20px; }
+    .modal-tabs {
+      display:flex; background:var(--card2); border-radius:12px;
+      padding:3px; margin-bottom:18px; gap:3px;
+    }
+    .modal-tab {
+      flex:1; padding:10px 8px; border-radius:9px; border:none;
+      background:transparent; color:var(--fg2);
+      font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer;
+      transition: all 0.3s var(--spring);
+    }
+    .modal-tab.active {
+      background:var(--card); color:var(--fg);
+      box-shadow:0 2px 10px rgba(0,0,0,0.18);
+      transform:scale(1.02);
+    }
+    .form-group { margin-bottom:14px; }
+    .form-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.5px; margin-bottom:7px; display:block; text-transform:uppercase; }
+    .form-input {
+      width:100%; background:var(--card2); border:1.5px solid transparent;
+      border-radius:var(--radius-xs); padding:14px 16px; color:var(--fg);
+      font-family:var(--font); font-size:16px; outline:none;
+      transition:all 0.2s var(--ease-out); -webkit-appearance:none;
+    }
+    .form-input:focus { border-color:var(--blue); background:var(--card); }
     .form-input::placeholder { color:var(--fg3); }
-    .form-select { appearance:none; cursor:pointer; }
+    .form-select { cursor:pointer; }
     .form-select option { background:var(--card); }
-    .submit-btn { width:100%; height:54px; border-radius:14px; border:none; background:var(--fg); color:var(--bg); font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; transition:all var(--transition); }
-    .submit-btn:active { transform:scale(0.98); }
+    .submit-btn {
+      width:100%; height:54px; border-radius:14px; border:none;
+      background:var(--fg); color:var(--bg);
+      font-family:var(--font); font-size:16px; font-weight:600; cursor:pointer;
+      margin-top:8px; transition:transform 0.2s var(--spring);
+    }
+    .submit-btn:active { transform:scale(0.97); }
 
-    /* Empty state */
-    .empty { text-align:center; padding:32px 0; color:var(--fg3); font-size:14px; }
-
-    /* Toast */
-    .toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-80px); background:var(--fg); color:var(--bg); padding:12px 20px; border-radius:100px; font-size:13px; font-weight:500; z-index:500; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); white-space:nowrap; }
+    /* ─── TOAST ─── */
+    .toast {
+      position:fixed; top: calc(16px + var(--safe-top));
+      left:50%; transform:translateX(-50%) translateY(-100px);
+      background:var(--card); color:var(--fg);
+      padding:12px 22px; border-radius:100px;
+      font-size:14px; font-weight:500; z-index:600;
+      transition:transform 0.4s var(--spring);
+      white-space:nowrap; border:1px solid var(--border);
+      box-shadow:var(--shadow);
+    }
     .toast.show { transform:translateX(-50%) translateY(0); }
 
-    /* Animations */
-    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .fade-in { animation:fadeIn 0.4s ease forwards; }
+    /* ─── EMPTY ─── */
+    .empty { text-align:center; padding:28px 0; color:var(--fg3); font-size:14px; }
+
+    /* ─── STAGGER DELAYS ─── */
+    .stagger-1{animation-delay:0.05s}
+    .stagger-2{animation-delay:0.1s}
+    .stagger-3{animation-delay:0.15s}
+    .stagger-4{animation-delay:0.2s}
+    .stagger-5{animation-delay:0.25s}
+    .stagger-6{animation-delay:0.3s}
   </style>
 </head>
 <body>
-<div id="app" class="dark"><div id="root"></div></div>
+<div id="app">
+
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen">
+    <div class="lock-time" id="lock-time">--:--</div>
+    <div class="lock-date" id="lock-date">--</div>
+    <div class="lock-logo-wrap">
+      <span class="lock-logo-letter">D</span>
+    </div>
+    <div class="lock-app-name">Deonats</div>
+    <div class="lock-hint" id="lock-hint">Введите код</div>
+    <div class="pinpad">
+      <div class="pin-dots" id="pin-dots">
+        <div class="pin-dot" id="d0"></div>
+        <div class="pin-dot" id="d1"></div>
+        <div class="pin-dot" id="d2"></div>
+        <div class="pin-dot" id="d3"></div>
+        <div class="pin-dot" id="d4"></div>
+        <div class="pin-dot" id="d5"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pinPress('1')"><span class="pk-num">1</span></button>
+        <button class="pin-key" onclick="pinPress('2')"><span class="pk-num">2</span><span class="pk-sub">ABC</span></button>
+        <button class="pin-key" onclick="pinPress('3')"><span class="pk-num">3</span><span class="pk-sub">DEF</span></button>
+        <button class="pin-key" onclick="pinPress('4')"><span class="pk-num">4</span><span class="pk-sub">GHI</span></button>
+        <button class="pin-key" onclick="pinPress('5')"><span class="pk-num">5</span><span class="pk-sub">JKL</span></button>
+        <button class="pin-key" onclick="pinPress('6')"><span class="pk-num">6</span><span class="pk-sub">MNO</span></button>
+        <button class="pin-key" onclick="pinPress('7')"><span class="pk-num">7</span><span class="pk-sub">PQRS</span></button>
+        <button class="pin-key" onclick="pinPress('8')"><span class="pk-num">8</span><span class="pk-sub">TUV</span></button>
+        <button class="pin-key" onclick="pinPress('9')"><span class="pk-num">9</span><span class="pk-sub">WXYZ</span></button>
+        <button class="pin-key pin-empty"></button>
+        <button class="pin-key" onclick="pinPress('0')"><span class="pk-num">0</span></button>
+        <button class="pin-key pin-del" onclick="pinDel()">
+          <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+            <path d="M8 1L1 8L8 15M1 8H21" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 2H9L4 8L9 14H21V2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+            <path d="M14 5L18 11M18 5L14 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="main-app">
+    <div id="app-inner"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
 
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script>
+// ─── PIN LOGIC ───────────────────────────────────────────────────────────────
+const CORRECT_PIN = "170117";
+let pinBuffer = "";
+
+function updateDots() {
+  for(let i = 0; i < 6; i++) {
+    const d = document.getElementById('d'+i);
+    d.classList.toggle('filled', i < pinBuffer.length);
+    d.classList.remove('error');
+  }
+}
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('lock-time').textContent = h + ':' + m;
+  const days = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  document.getElementById('lock-date').textContent =
+    days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()];
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+function pinPress(digit) {
+  if(pinBuffer.length >= 6) return;
+  pinBuffer += digit;
+  updateDots();
+  if(pinBuffer.length === 6) {
+    setTimeout(() => {
+      if(pinBuffer === CORRECT_PIN) {
+        unlockApp();
+      } else {
+        for(let i = 0; i < 6; i++) document.getElementById('d'+i).classList.add('error');
+        document.getElementById('lock-hint').textContent = 'Неверный код';
+        setTimeout(() => {
+          pinBuffer = "";
+          updateDots();
+          document.getElementById('lock-hint').textContent = 'Введите код';
+        }, 600);
+      }
+    }, 80);
+  }
+}
+
+function pinDel() {
+  if(pinBuffer.length > 0) {
+    pinBuffer = pinBuffer.slice(0,-1);
+    updateDots();
+  }
+}
+
+function unlockApp() {
+  const lock = document.getElementById('lock-screen');
+  const main = document.getElementById('main-app');
+  lock.classList.add('unlock-anim');
+  main.classList.add('visible');
+  setTimeout(() => { lock.style.display = 'none'; }, 700);
+}
+</script>
+
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useCallback } = React;
 
-const API = "https://deonats-production.up.railway.app/api/v1";
-
+// ─── i18n ────────────────────────────────────────────────────────────────────
 const i18n = {
   ru: {
-    balance: "Общий баланс", income: "Доходы", expenses: "Расходы",
-    goals: "Цели", transactions: "Транзакции", seeAll: "Все",
-    addTx: "Добавить транзакцию", category: "Категория", amount: "Сумма",
-    description: "Описание", add: "Добавить", typeIncome: "Доход", typeExpense: "Расход",
-    saved: "Сохранено", until: "до", noTx: "Транзакций пока нет",
-    noGoals: "Целей пока нет", food: "Еда", transport: "Транспорт",
-    entertainment: "Развлечения", salary: "Зарплата", other: "Другое",
-    shopping: "Покупки",
+    balance:"Общий баланс", income:"Доходы", expenses:"Расходы",
+    goals:"Цели", transactions:"Транзакции", seeAll:"Все",
+    addTx:"Добавить транзакцию", category:"Категория", amount:"Сумма",
+    description:"Описание", add:"Добавить", typeIncome:"Доход", typeExpense:"Расход",
+    saved:"Добавлено ✓", noTx:"Транзакций пока нет", noGoals:"Целей пока нет",
+    until:"до", left:"осталось",
   },
   en: {
-    balance: "Total Balance", income: "Income", expenses: "Expenses",
-    goals: "Goals", transactions: "Transactions", seeAll: "All",
-    addTx: "Add Transaction", category: "Category", amount: "Amount",
-    description: "Description", add: "Add", typeIncome: "Income", typeExpense: "Expense",
-    saved: "Saved", until: "until", noTx: "No transactions yet",
-    noGoals: "No goals yet", food: "Food", transport: "Transport",
-    entertainment: "Entertainment", salary: "Salary", other: "Other",
-    shopping: "Shopping",
+    balance:"Total Balance", income:"Income", expenses:"Expenses",
+    goals:"Goals", transactions:"Transactions", seeAll:"All",
+    addTx:"Add Transaction", category:"Category", amount:"Amount",
+    description:"Description", add:"Add", typeIncome:"Income", typeExpense:"Expense",
+    saved:"Added ✓", noTx:"No transactions yet", noGoals:"No goals yet",
+    until:"until", left:"left",
   }
 };
 
+// ─── CURRENCIES ──────────────────────────────────────────────────────────────
+const CURRENCIES = {
+  KZT: { symbol:"₸", name:"Тенге",  rate:1 },
+  RUB: { symbol:"₽", name:"Рубли",  rate:0.21 },
+  USD: { symbol:"$", name:"USD",    rate:0.00218 },
+};
+
+// ─── CATEGORIES ──────────────────────────────────────────────────────────────
 const CATEGORIES = {
   ru: [
-    { id:"food", label:"Еда", icon:"🍔" },
-    { id:"transport", label:"Транспорт", icon:"🚇" },
-    { id:"entertainment", label:"Развлечения", icon:"🎮" },
-    { id:"shopping", label:"Покупки", icon:"🛍️" },
-    { id:"salary", label:"Зарплата", icon:"💼" },
-    { id:"other", label:"Другое", icon:"💡" },
+    {id:"food",          label:"Еда",           icon:"🍔"},
+    {id:"transport",     label:"Транспорт",      icon:"🚇"},
+    {id:"entertainment", label:"Развлечения",    icon:"🎮"},
+    {id:"shopping",      label:"Покупки",        icon:"🛍️"},
+    {id:"salary",        label:"Зарплата",       icon:"💼"},
+    {id:"other",         label:"Другое",         icon:"💡"},
   ],
   en: [
-    { id:"food", label:"Food", icon:"🍔" },
-    { id:"transport", label:"Transport", icon:"🚇" },
-    { id:"entertainment", label:"Entertainment", icon:"🎮" },
-    { id:"shopping", label:"Shopping", icon:"🛍️" },
-    { id:"salary", label:"Salary", icon:"💼" },
-    { id:"other", label:"Other", icon:"💡" },
+    {id:"food",          label:"Food",           icon:"🍔"},
+    {id:"transport",     label:"Transport",      icon:"🚇"},
+    {id:"entertainment", label:"Entertainment",  icon:"🎮"},
+    {id:"shopping",      label:"Shopping",       icon:"🛍️"},
+    {id:"salary",        label:"Salary",         icon:"💼"},
+    {id:"other",         label:"Other",          icon:"💡"},
   ]
 };
 
+// ─── SAMPLE DATA (in KZT) ────────────────────────────────────────────────────
 const SAMPLE_TX = [
-  { id:1, name:"Зарплата", category:"salary", icon:"💼", amount:180000, type:"income", date:"23 мая" },
-  { id:2, name:"Продукты", category:"food", icon:"🍔", amount:-4200, type:"expense", date:"22 мая" },
-  { id:3, name:"Метро", category:"transport", icon:"🚇", amount:-800, type:"expense", date:"22 мая" },
-  { id:4, name:"Spotify", category:"entertainment", icon:"🎮", amount:-299, type:"expense", date:"21 мая" },
-  { id:5, name:"Фриланс", category:"other", icon:"💡", amount:25000, type:"income", date:"20 мая" },
+  {id:1, name:"Зарплата",   category:"salary",        icon:"💼", amount:450000,  type:"income",  date:"23 мая"},
+  {id:2, name:"Продукты",   category:"food",          icon:"🍔", amount:-8400,   type:"expense", date:"22 мая"},
+  {id:3, name:"Метро",      category:"transport",     icon:"🚇", amount:-1600,   type:"expense", date:"22 мая"},
+  {id:4, name:"Кинотеатр",  category:"entertainment", icon:"🎮", amount:-4200,   type:"expense", date:"21 мая"},
+  {id:5, name:"Фриланс",    category:"other",         icon:"💡", amount:85000,   type:"income",  date:"20 мая"},
+  {id:6, name:"Одежда",     category:"shopping",      icon:"🛍️", amount:-18500,  type:"expense", date:"19 мая"},
 ];
 
 const SAMPLE_GOALS = [
-  { id:1, name:"MacBook Pro", current:87000, target:200000, deadline:"2025-12-31", color:"green" },
-  { id:2, name:"Отпуск в Японии", current:45000, target:150000, deadline:"2026-03-01", color:"gold" },
-  { id:3, name:"Подушка безопасности", current:320000, target:500000, deadline:"2026-12-31", color:"green" },
+  {id:1, name:"MacBook Pro",        icon:"💻", current:250000, target:550000, deadline:"2025-12-31", color:"green"},
+  {id:2, name:"Отпуск / Таиланд",   icon:"✈️", current:130000, target:400000, deadline:"2026-03-01", color:"gold"},
+  {id:3, name:"Резервный фонд",     icon:"🛡️", current:580000, target:1000000,deadline:"2026-12-31", color:"blue"},
 ];
 
-function fmt(n) {
-  return Math.abs(n).toLocaleString("ru-RU");
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function fmtAmount(kztAmount, curKey) {
+  const cur = CURRENCIES[curKey];
+  const val = kztAmount * cur.rate;
+  if(Math.abs(val) >= 1000000) return (val/1000000).toFixed(1)+"M";
+  if(Math.abs(val) >= 1000)    return Math.round(val).toLocaleString("ru-RU");
+  return val < 1 && val > -1 ? val.toFixed(2) : Math.round(val).toLocaleString("ru-RU");
 }
 
-function Toast({ msg, show }) {
-  return <div className={`toast${show?" show":""}`}>{msg}</div>;
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
 }
 
-function BalanceCard({ t, transactions }) {
-  const income = transactions.filter(x=>x.type==="income").reduce((s,x)=>s+x.amount,0);
+// ─── BALANCE CARD ─────────────────────────────────────────────────────────────
+function BalanceCard({t, transactions, currency}) {
+  const cur = CURRENCIES[currency];
+  const income  = transactions.filter(x=>x.type==="income").reduce((s,x)=>s+x.amount,0);
   const expense = transactions.filter(x=>x.type==="expense").reduce((s,x)=>s+Math.abs(x.amount),0);
   const balance = income - expense;
   return (
-    <div className="balance-card fade-in">
+    <div className="balance-card">
       <div className="balance-label">{t.balance}</div>
       <div className="balance-amount">
-        <span>₽</span>{fmt(balance)}
+        <span className="balance-currency">{cur.symbol}</span>
+        <span>{fmtAmount(balance, currency)}</span>
       </div>
       <div className="balance-row">
         <div className="balance-stat">
           <div className="balance-stat-label">{t.income}</div>
-          <div className="balance-stat-val income">+{fmt(income)}</div>
+          <div className="balance-stat-val income">{cur.symbol}{fmtAmount(income,currency)}</div>
         </div>
         <div className="balance-stat">
           <div className="balance-stat-label">{t.expenses}</div>
-          <div className="balance-stat-val expense">−{fmt(expense)}</div>
+          <div className="balance-stat-val expense">{cur.symbol}{fmtAmount(expense,currency)}</div>
         </div>
       </div>
     </div>
   );
 }
 
-function GoalCard({ goal, lang }) {
-  const pct = Math.round(goal.current / goal.target * 100);
+// ─── GOAL CARD ────────────────────────────────────────────────────────────────
+function GoalCard({goal, lang, currency, delay}) {
+  const cur = CURRENCIES[currency];
+  const pct = Math.min(100, Math.round(goal.current / goal.target * 100));
   const d = new Date(goal.deadline);
   const dateStr = d.toLocaleDateString(lang==="ru"?"ru-RU":"en-US", {day:"numeric",month:"short",year:"numeric"});
+  const left = goal.target - goal.current;
   return (
-    <div className="goal-card">
+    <div className={`goal-card stagger-${delay}`}>
       <div className="goal-top">
         <div>
+          <div className="goal-icon">{goal.icon}</div>
           <div className="goal-name">{goal.name}</div>
           <div className="goal-deadline">{lang==="ru"?"до":"until"} {dateStr}</div>
         </div>
-        <div>
-          <div className="goal-amount">₽{fmt(goal.current)}</div>
-          <div className="goal-target">из ₽{fmt(goal.target)}</div>
+        <div className="goal-right">
+          <div className="goal-amount">{cur.symbol}{fmtAmount(goal.current,currency)}</div>
+          <div className="goal-target">{lang==="ru"?"из":"of"} {cur.symbol}{fmtAmount(goal.target,currency)}</div>
         </div>
       </div>
       <div className="progress-track">
@@ -257,76 +631,85 @@ function GoalCard({ goal, lang }) {
       </div>
       <div className="goal-footer">
         <div className="goal-pct">{pct}%</div>
-        <div className="goal-pct">₽{fmt(goal.target-goal.current)} {lang==="ru"?"осталось":"left"}</div>
+        <div className="goal-pct">{cur.symbol}{fmtAmount(left,currency)} {lang==="ru"?"осталось":"left"}</div>
       </div>
     </div>
   );
 }
 
-function TxItem({ tx, isLast }) {
+// ─── TX ITEM ──────────────────────────────────────────────────────────────────
+function TxItem({tx, isLast, currency, delay}) {
+  const cur = CURRENCIES[currency];
   const pos = tx.amount > 0;
   return (
     <>
-      <div className="tx-item">
+      <div className={`tx-item stagger-${delay}`}>
         <div className="tx-icon">{tx.icon}</div>
         <div className="tx-info">
           <div className="tx-name">{tx.name}</div>
           <div className="tx-date">{tx.date}</div>
         </div>
-        <div className="tx-amount" style={{color: pos?"var(--green)":"var(--fg)"}}>
-          {pos?"+":""}{pos ? fmt(tx.amount) : "−"+fmt(Math.abs(tx.amount))} ₽
+        <div className="tx-amount" style={{color:pos?"var(--green)":"var(--fg)"}}>
+          {pos?"+":" −"}{cur.symbol}{fmtAmount(Math.abs(tx.amount),currency)}
         </div>
       </div>
-      {!isLast && <div className="tx-divider"/>}
+      {!isLast && <div className="tx-sep"/>}
     </>
   );
 }
 
-function AddModal({ open, onClose, onAdd, t, lang }) {
-  const [type, setType] = useState("expense");
+// ─── ADD MODAL ────────────────────────────────────────────────────────────────
+function AddModal({open, onClose, onAdd, t, lang, currency}) {
+  const [type, setType]     = useState("expense");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("food");
-  const [desc, setDesc] = useState("");
+  const [cat, setCat]       = useState("food");
+  const [desc, setDesc]     = useState("");
   const cats = CATEGORIES[lang];
+  const cur  = CURRENCIES[currency];
 
   const handleSubmit = () => {
-    if (!amount || isNaN(parseFloat(amount))) return;
-    const cat = cats.find(c=>c.id===category);
+    const raw = parseFloat(amount.replace(/\s/g,"").replace(",","."));
+    if(!amount || isNaN(raw) || raw <= 0) return;
+    // Convert entered amount back to KZT base
+    const kztAmt = raw / cur.rate;
+    const c = cats.find(c=>c.id===cat);
     onAdd({
       id: Date.now(),
-      name: desc || cat.label,
-      category,
-      icon: cat.icon,
-      amount: type==="income" ? parseFloat(amount) : -parseFloat(amount),
+      name: desc || c.label,
+      category: cat, icon: c.icon,
+      amount: type==="income" ? kztAmt : -kztAmt,
       type,
       date: new Date().toLocaleDateString(lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short"})
     });
-    setAmount(""); setDesc(""); setCategory("food");
+    setAmount(""); setDesc(""); setCat("food");
     onClose();
   };
 
   return (
-    <div className={`modal-overlay${open?" open":""}`} onClick={e=>{if(e.target.className.includes("modal-overlay"))onClose();}}>
+    <div className={`modal-overlay${open?" open":""}`}
+         onClick={e=>{if(e.currentTarget===e.target)onClose();}}>
       <div className="modal">
         <div className="modal-handle"/>
         <div className="modal-title">{t.addTx}</div>
         <div className="modal-tabs">
           <button className={`modal-tab${type==="expense"?" active":""}`} onClick={()=>setType("expense")}>{t.typeExpense}</button>
-          <button className={`modal-tab${type==="income"?" active":""}`} onClick={()=>setType("income")}>{t.typeIncome}</button>
+          <button className={`modal-tab${type==="income"?" active":""}`}  onClick={()=>setType("income")}>{t.typeIncome}</button>
         </div>
         <div className="form-group">
-          <label className="form-label">{t.amount}</label>
-          <input className="form-input" type="number" placeholder="0" value={amount} onChange={e=>setAmount(e.target.value)} />
+          <label className="form-label">{t.amount} ({cur.symbol})</label>
+          <input className="form-input" type="number" inputMode="decimal"
+                 placeholder="0" value={amount} onChange={e=>setAmount(e.target.value)}/>
         </div>
         <div className="form-group">
           <label className="form-label">{t.category}</label>
-          <select className="form-input form-select" value={category} onChange={e=>setCategory(e.target.value)}>
+          <select className="form-input form-select" value={cat} onChange={e=>setCat(e.target.value)}>
             {cats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
           </select>
         </div>
         <div className="form-group">
           <label className="form-label">{t.description}</label>
-          <input className="form-input" type="text" placeholder={t.description} value={desc} onChange={e=>setDesc(e.target.value)} />
+          <input className="form-input" type="text" placeholder={t.description}
+                 value={desc} onChange={e=>setDesc(e.target.value)}/>
         </div>
         <button className="submit-btn" onClick={handleSubmit}>{t.add}</button>
       </div>
@@ -334,57 +717,66 @@ function AddModal({ open, onClose, onAdd, t, lang }) {
   );
 }
 
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
 function App() {
-  const [theme, setTheme] = useState("dark");
-  const [lang, setLang] = useState("ru");
-  const [modal, setModal] = useState(false);
+  const [theme,        setTheme]        = useState("dark");
+  const [lang,         setLang]         = useState("ru");
+  const [currency,     setCurrency]     = useState("KZT");
+  const [modal,        setModal]        = useState(false);
   const [transactions, setTransactions] = useState(SAMPLE_TX);
-  const [toast, setToast] = useState({show:false, msg:""});
   const t = i18n[lang];
 
   useEffect(() => {
     document.getElementById("app").className = theme;
   }, [theme]);
 
-  const showToast = (msg) => {
-    setToast({show:true, msg});
-    setTimeout(()=>setToast({show:false,msg:""}), 2000);
-  };
-
-  const addTx = (tx) => {
+  const addTx = useCallback((tx) => {
     setTransactions(prev=>[tx,...prev]);
-    showToast("✓ " + t.saved);
-  };
+    showToast(t.saved);
+  }, [t]);
 
   return (
     <>
-      <Toast msg={toast.msg} show={toast.show}/>
       <header>
         <div className="logo">Deonats</div>
         <div className="header-actions">
           <button className={`icon-btn lang-btn${lang==="ru"?" active":""}`} onClick={()=>setLang("ru")}>RU</button>
           <button className={`icon-btn lang-btn${lang==="en"?" active":""}`} onClick={()=>setLang("en")}>EN</button>
-          <button className="icon-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}>
-            {theme==="dark" ? "○" : "●"}
+          <button className="icon-btn" style={{width:38,padding:0,justifyContent:"center"}}
+                  onClick={()=>setTheme(p=>p==="dark"?"light":"dark")}>
+            {theme==="dark" ? "☀️" : "🌙"}
           </button>
         </div>
       </header>
 
       <div className="scroll">
-        <BalanceCard t={t} transactions={transactions}/>
 
+        {/* CURRENCY SWITCHER */}
+        <div className="currency-switcher">
+          {Object.entries(CURRENCIES).map(([key,cur])=>(
+            <button key={key} className={`cur-btn${currency===key?" active":""}`}
+                    onClick={()=>setCurrency(key)}>
+              {cur.symbol} {key}
+            </button>
+          ))}
+        </div>
+
+        {/* BALANCE */}
+        <BalanceCard t={t} transactions={transactions} currency={currency}/>
+
+        {/* GOALS */}
         <div>
           <div className="section-header">
             <div className="section-title">{t.goals}</div>
           </div>
           <div className="goals-list">
-            {SAMPLE_GOALS.length === 0
-              ? <div className="empty">{t.noGoals}</div>
-              : SAMPLE_GOALS.map(g=><GoalCard key={g.id} goal={g} lang={lang}/>)
-            }
+            {SAMPLE_GOALS.map((g,i)=>
+              <GoalCard key={g.id} goal={g} lang={lang} currency={currency} delay={i+1}/>
+            )}
           </div>
         </div>
 
+        {/* TRANSACTIONS */}
         <div>
           <div className="section-header">
             <div className="section-title">{t.transactions}</div>
@@ -393,23 +785,28 @@ function App() {
           {transactions.length === 0
             ? <div className="empty">{t.noTx}</div>
             : <div className="tx-list">
-                {transactions.slice(0,6).map((tx,i)=><TxItem key={tx.id} tx={tx} isLast={i===Math.min(transactions.length,6)-1}/>)}
+                {transactions.slice(0,6).map((tx,i)=>
+                  <TxItem key={tx.id} tx={tx}
+                          isLast={i===Math.min(transactions.length,6)-1}
+                          currency={currency} delay={Math.min(i+1,6)}/>
+                )}
               </div>
           }
         </div>
       </div>
 
       <button className="fab" onClick={()=>setModal(true)}>
-        <span className="fab-icon">+</span>
+        <span className="fab-plus">+</span>
         {t.addTx}
       </button>
 
-      <AddModal open={modal} onClose={()=>setModal(false)} onAdd={addTx} t={t} lang={lang}/>
+      <AddModal open={modal} onClose={()=>setModal(false)}
+                onAdd={addTx} t={t} lang={lang} currency={currency}/>
     </>
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById("app-inner")).render(React.createElement(App));
 </script>
 </body>
 </html>
