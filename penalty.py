@@ -5,7 +5,7 @@ PenaltyEngine — штрафует за досрочный вывод средс
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from app.models.models import Goal, GoalStatusEnum, SystemLog
+from models import ...
 
 PENALTY_RATE = 0.15  # 15%
 
