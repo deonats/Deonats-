@@ -6,20 +6,203 @@
   <title>DEONATS — Financial OS</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0A0A0A; color: #D4D4D4; font-family: 'Courier New', monospace; }
+    body { background: #0A0A0A; }
   </style>
 </head>
 <body>
   <div id="root"></div>
-
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script type="text/babel" src="/Deonats-/DeonatsTerminal.jsx"></script>
   <script type="text/babel">
-    const domNode = document.getElementById('root');
-    const root = ReactDOM.createRoot(domNode);
-    root.render(React.createElement(DeonatsTerminal));
+    const { useState, useEffect, useRef, useCallback } = React;
+    const API_BASE = "https://deonats-production.up.railway.app/api/v1";
+
+    const T = {
+      ru: { placeholder: "введите команду...", boot: ["██████████████████████████████", "  DEONATS FINANCIAL OS v1.0.0", "  INDUSTRIAL BRUTALISM KERNEL", "██████████████████████████████", "", "ЗАГРУЗКА МОДУЛЕЙ...", "ВСЕ МОДУЛИ ЗАГРУЖЕНЫ — OK", "", "ВВЕДИТЕ 'help' ДЛЯ СПИСКА КОМАНД"] },
+      en: { placeholder: "enter command...", boot: ["██████████████████████████████", "  DEONATS FINANCIAL OS v1.0.0", "  INDUSTRIAL BRUTALISM KERNEL", "██████████████████████████████", "", "LOADING MODULES...", "ALL MODULES LOADED — OK", "", "TYPE 'help' FOR COMMAND LIST"] }
+    };
+
+    const HELP = {
+      ru: ["─────────────────────────────────────", "login [user] [pass]     — вход", "add [сумма] [тип] [кат] — транзакция", "check-status            — статус ядра", "goal-add [назв] [сумма] [дата] — цель", "goal-status             — список целей", "repay-debt [id] [сумма] — погасить долг", "theme [dark|light]      — тема", "lang [ru|en]            — язык", "clear                   — очистить", "─────────────────────────────────────"],
+      en: ["─────────────────────────────────────", "login [user] [pass]     — login", "add [amount] [type] [cat] — transaction", "check-status            — kernel status", "goal-add [name] [amt] [date] — goal", "goal-status             — list goals", "repay-debt [id] [amt]   — repay debt", "theme [dark|light]      — theme", "lang [ru|en]            — language", "clear                   — clear", "─────────────────────────────────────"]
+    };
+
+    async function apiCall(path, method="GET", body=null) {
+      try {
+        const opts = { method, headers: {"Content-Type":"application/json"} };
+        if (body) opts.body = JSON.stringify(body);
+        const res = await fetch(API_BASE + path, opts);
+        return await res.json();
+      } catch(e) {
+        return { error: true, message: "KERNEL: CONNECTION LOST" };
+      }
+    }
+
+    function App() {
+      const [theme, setTheme] = useState("dark");
+      const [lang, setLang] = useState("ru");
+      const [logs, setLogs] = useState([]);
+      const [input, setInput] = useState("");
+      const [history, setHistory] = useState([]);
+      const [histIdx, setHistIdx] = useState(-1);
+      const [authed, setAuthed] = useState(false);
+      const [userId, setUserId] = useState(null);
+      const [booted, setBooted] = useState(false);
+      const endRef = useRef(null);
+      const inputRef = useRef(null);
+
+      const dark = theme === "dark";
+      const css = {
+        bg: dark ? "#0A0A0A" : "#E5E5E5",
+        fg: dark ? "#D4D4D4" : "#1A1A1A",
+        gold: dark ? "#C9A84C" : "#8B6914",
+        panic: dark ? "#FF3333" : "#CC0000",
+        warn: dark ? "#FF9900" : "#BB6600",
+        ok: dark ? "#33CC77" : "#006633",
+        dim: dark ? "#555" : "#888",
+        border: dark ? "#222" : "#AAA",
+        surface: dark ? "#111" : "#D8D8D8",
+      };
+
+      useEffect(() => { endRef.current?.scrollIntoView({behavior:"smooth"}); }, [logs]);
+
+      useEffect(() => {
+        if (booted) return;
+        setBooted(true);
+        T[lang].boot.forEach((line, i) => {
+          setTimeout(() => {
+            setLogs(prev => [...prev, {id: Date.now()+i, type: line.startsWith("██") ? "system" : line.startsWith("ВСЕ") || line.startsWith("ALL") ? "success" : line.startsWith("ВВЕДИТЕ") || line.startsWith("TYPE") ? "warn" : "system", text: line || " "}]);
+          }, i * 100);
+        });
+      }, []);
+
+      const addLog = useCallback((type, text) => {
+        const ts = new Date().toLocaleTimeString("en-GB",{hour12:false}).slice(0,5);
+        setLogs(prev => [...prev, {id: Date.now()+Math.random(), type, text, ts}]);
+      }, []);
+
+      const handleCmd = useCallback(async (raw) => {
+        const trimmed = raw.trim();
+        if (!trimmed) return;
+        setHistory(prev => [trimmed, ...prev.slice(0,49)]);
+        setHistIdx(-1);
+        addLog("input", trimmed);
+        const parts = trimmed.split(/\s+/);
+        const cmd = parts[0].toLowerCase();
+
+        if (cmd === "clear") { setLogs([]); return; }
+        if (cmd === "theme") { const v=parts[1]; if(v==="dark"||v==="light"){setTheme(v);addLog("success","THEME: "+v.toUpperCase());}else addLog("error","USAGE: theme [dark|light]"); return; }
+        if (cmd === "lang") { const v=parts[1]; if(v==="ru"||v==="en"){setLang(v);addLog("success","LANG: "+v.toUpperCase());}else addLog("error","USAGE: lang [ru|en]"); return; }
+        if (cmd === "help") { HELP[lang].forEach(l => addLog("system", l)); return; }
+
+        if (!authed && cmd !== "login") { addLog("warn", lang==="ru"?"ТРЕБУЕТСЯ: login [user] [pass]":"REQUIRED: login [user] [pass]"); return; }
+
+        if (cmd === "login") {
+          const [,u,p] = parts;
+          if (!u||!p) { addLog("error","USAGE: login [username] [password]"); return; }
+          addLog("system","AUTHENTICATING...");
+          const res = await apiCall("/auth/login","POST",{username:u,password:p});
+          if (res.detail||res.error) { addLog("panic", res.detail||res.message); }
+          else { setAuthed(true); setUserId(res.user_id); addLog("success",`WELCOME, ${res.username.toUpperCase()}`); }
+          return;
+        }
+
+        if (cmd === "check-status") {
+          const res = await apiCall(`/status/${userId}`);
+          if (res.error) { addLog("error",res.message); return; }
+          addLog(res.kernel_panic?"panic":"success", res.kernel_panic?"⚡ KERNEL PANIC":"■ KERNEL OK");
+          (res.categories||[]).forEach(c => addLog(c.blocked?"panic":"output", `  ${c.category.toUpperCase()}: ${c.blocked?"BLOCKED":`${c.limit}`}`));
+          return;
+        }
+
+        if (cmd === "add") {
+          const [,amt,type,cat,...desc] = parts;
+          if (!amt||!type||!cat) { addLog("error","USAGE: add [сумма] [income|expense] [категория]"); return; }
+          const res = await apiCall("/transaction/add","POST",{user_id:userId,amount:parseFloat(amt),type,category:cat,description:desc.join(" ")||null});
+          if (res.error) addLog("error",res.message);
+          else if (res.status==="BLOCKED") addLog("panic",res.message);
+          else addLog("success",res.message);
+          return;
+        }
+
+        if (cmd === "goal-add") {
+          const [,...rest] = parts;
+          const deadline=rest.pop(), amount=rest.pop(), name=rest.join(" ");
+          if (!name||!amount||!deadline) { addLog("error","USAGE: goal-add [название] [сумма] [YYYY-MM-DD]"); return; }
+          const res = await apiCall("/goal/add","POST",{user_id:userId,name,amount:parseFloat(amount),deadline:new Date(deadline).toISOString()});
+          if (res.error) addLog("error",res.message||"ERROR");
+          else addLog("success",res.message);
+          return;
+        }
+
+        if (cmd === "goal-status") {
+          const res = await apiCall(`/goal/status/${userId}`);
+          if (res.error) { addLog("error",res.message); return; }
+          addLog("output",`${res.goals.length} GOALS:`);
+          res.goals.forEach(g => addLog(g.status==="violated"?"warn":"output", `  [${g.status.toUpperCase()}] ${g.name}: ${g.current_amount}/${g.target_amount}`));
+          return;
+        }
+
+        if (cmd === "repay-debt") {
+          const [,id,amt] = parts;
+          if (!id||!amt) { addLog("error","USAGE: repay-debt [id] [сумма]"); return; }
+          const res = await apiCall("/debt/repay","POST",{user_id:userId,debt_id:parseInt(id),amount:parseFloat(amt)});
+          if (res.error) addLog("error",res.message);
+          else addLog(res.status==="DEBT_CLOSED"?"success":"output",res.message);
+          return;
+        }
+
+        addLog("error",`UNKNOWN: '${cmd}' — type 'help'`);
+      }, [authed, userId, lang, addLog]);
+
+      const colors = {input:css.gold,output:css.fg,error:css.panic,warn:css.warn,success:css.ok,system:css.dim,panic:"#FF2020"};
+      const prefixes = {input:"► ",output:"  ",error:"✖ ",warn:"⚠ ",success:"✔ ",system:"§ ",panic:"!!! "};
+
+      return (
+        <div onClick={()=>inputRef.current?.focus()} style={{minHeight:"100vh",background:css.bg,color:css.fg,fontFamily:"'Courier New',monospace",display:"flex",flexDirection:"column",cursor:"text"}}>
+          <div style={{borderBottom:`1px solid ${css.border}`,padding:"6px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",background:css.surface,flexShrink:0}}>
+            <div>
+              <span style={{color:css.gold,fontSize:"14px",letterSpacing:"3px",fontWeight:"bold"}}>DEONATS</span>
+              <span style={{color:css.dim,fontSize:"10px",marginLeft:"10px"}}>FINANCIAL OS v1.0.0</span>
+            </div>
+            <div style={{display:"flex",gap:"10px",fontSize:"10px"}}>
+              {["dark","light"].map(t=><span key={t} onClick={e=>{e.stopPropagation();setTheme(t);}} style={{cursor:"pointer",color:theme===t?css.gold:css.dim}}>{t.toUpperCase()}</span>)}
+              <span style={{color:css.border}}>|</span>
+              {["ru","en"].map(l=><span key={l} onClick={e=>{e.stopPropagation();setLang(l);}} style={{cursor:"pointer",color:lang===l?css.gold:css.dim}}>{l.toUpperCase()}</span>)}
+              {authed && <><span style={{color:css.border}}>|</span><span style={{color:css.ok}}>● ONLINE</span></>}
+            </div>
+          </div>
+
+          <div style={{flex:1,overflowY:"auto",padding:"12px 14px",minHeight:"400px"}}>
+            {logs.map(log=>(
+              <div key={log.id} style={{display:"flex",gap:"6px",color:colors[log.type]||css.fg,fontSize:"12px",lineHeight:"1.6",padding:"0.5px 0",fontFamily:"'Courier New',monospace"}}>
+                {log.ts && <span style={{color:css.dim,fontSize:"10px",opacity:0.5,minWidth:"40px"}}>{log.ts}</span>}
+                <span style={{opacity:0.4}}>{prefixes[log.type]||"  "}</span>
+                <span style={{flex:1,wordBreak:"break-word"}}>{log.text}</span>
+              </div>
+            ))}
+            <div ref={endRef}/>
+          </div>
+
+          <div style={{borderTop:`1px solid ${css.border}`,padding:"8px 14px",display:"flex",alignItems:"center",gap:"8px",background:css.surface,flexShrink:0}}>
+            <span style={{color:css.gold,fontSize:"12px",userSelect:"none"}}>{authed?`[${userId}]►`:"guest►"}</span>
+            <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{
+                if(e.key==="Enter"){handleCmd(input);setInput("");}
+                else if(e.key==="ArrowUp"){e.preventDefault();const n=Math.min(histIdx+1,history.length-1);setHistIdx(n);setInput(history[n]||"");}
+                else if(e.key==="ArrowDown"){e.preventDefault();const n=Math.max(histIdx-1,-1);setHistIdx(n);setInput(n===-1?"":(history[n]||""));}
+              }}
+              placeholder={T[lang].placeholder} autoFocus
+              style={{flex:1,background:"transparent",border:"none",outline:"none",color:css.fg,fontFamily:"'Courier New',monospace",fontSize:"12px",caretColor:css.gold}}/>
+            <span style={{color:css.dim,fontSize:"9px"}}>↑↓ · enter</span>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(React.createElement(App));
   </script>
 </body>
 </html>
