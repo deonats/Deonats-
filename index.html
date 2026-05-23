@@ -3,211 +3,413 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DEONATS — Financial OS</title>
+  <title>Deonats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0A0A0A; }
+    :root {
+      --bg: #000000;
+      --bg2: #0D0D0D;
+      --card: #121212;
+      --card2: #1A1A1A;
+      --border: rgba(255,255,255,0.07);
+      --fg: #FFFFFF;
+      --fg2: rgba(255,255,255,0.5);
+      --fg3: rgba(255,255,255,0.25);
+      --accent: #FFFFFF;
+      --accent-bg: rgba(255,255,255,0.08);
+      --green: #34D399;
+      --red: #F87171;
+      --gold: #F59E0B;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.4);
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .light {
+      --bg: #FAFAFA;
+      --bg2: #F0F0F0;
+      --card: #FFFFFF;
+      --card2: #F5F5F5;
+      --border: rgba(0,0,0,0.07);
+      --fg: #0A0A0A;
+      --fg2: rgba(0,0,0,0.45);
+      --fg3: rgba(0,0,0,0.2);
+      --accent: #0A0A0A;
+      --accent-bg: rgba(0,0,0,0.06);
+      --shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; background:var(--bg); font-family:var(--font); color:var(--fg); transition:background var(--transition), color var(--transition); }
+    #app { max-width:430px; margin:0 auto; min-height:100vh; background:var(--bg); position:relative; overflow-x:hidden; }
+
+    /* Header */
+    header { padding:20px 24px 0; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; background:var(--bg); }
+    .logo { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
+    .header-actions { display:flex; gap:8px; align-items:center; }
+    .icon-btn { width:38px; height:38px; border-radius:50%; border:none; background:var(--accent-bg); color:var(--fg); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all var(--transition); }
+    .icon-btn:active { transform:scale(0.92); }
+    .lang-btn { font-family:var(--font); font-size:12px; font-weight:500; width:auto; padding:0 12px; border-radius:100px; letter-spacing:0.3px; color:var(--fg2); }
+    .lang-btn.active { color:var(--fg); background:var(--accent-bg); }
+
+    /* Scroll container */
+    .scroll { padding:20px 24px 120px; display:flex; flex-direction:column; gap:28px; }
+
+    /* Balance card */
+    .balance-card { background:var(--card); border-radius:var(--radius); padding:28px 28px 24px; border:1px solid var(--border); box-shadow:var(--shadow); }
+    .balance-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px; }
+    .balance-amount { font-size:42px; font-weight:300; letter-spacing:-1.5px; line-height:1; margin-bottom:20px; }
+    .balance-amount span { font-size:24px; font-weight:400; opacity:0.4; margin-right:4px; vertical-align:top; margin-top:6px; display:inline-block; }
+    .balance-row { display:flex; gap:12px; }
+    .balance-stat { flex:1; background:var(--accent-bg); border-radius:var(--radius-sm); padding:14px; }
+    .balance-stat-label { font-size:11px; color:var(--fg2); margin-bottom:5px; font-weight:500; letter-spacing:0.5px; }
+    .balance-stat-val { font-size:17px; font-weight:500; letter-spacing:-0.3px; }
+    .income { color:var(--green); }
+    .expense { color:var(--red); }
+
+    /* Section */
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .section-title { font-size:15px; font-weight:600; letter-spacing:-0.2px; }
+    .section-link { font-size:13px; color:var(--fg2); cursor:pointer; font-weight:500; }
+
+    /* Goals */
+    .goals-list { display:flex; flex-direction:column; gap:14px; }
+    .goal-card { background:var(--card); border-radius:var(--radius-sm); padding:20px; border:1px solid var(--border); }
+    .goal-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+    .goal-name { font-size:14px; font-weight:500; }
+    .goal-deadline { font-size:11px; color:var(--fg3); margin-top:3px; }
+    .goal-amount { font-size:14px; font-weight:600; text-align:right; }
+    .goal-target { font-size:11px; color:var(--fg3); text-align:right; margin-top:2px; }
+    .progress-track { height:4px; background:var(--accent-bg); border-radius:100px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:100px; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--fg); }
+    .progress-fill.green { background:var(--green); }
+    .progress-fill.gold { background:var(--gold); }
+    .goal-footer { display:flex; justify-content:space-between; margin-top:10px; }
+    .goal-pct { font-size:11px; color:var(--fg2); font-family:var(--mono); }
+
+    /* Transactions */
+    .tx-list { display:flex; flex-direction:column; gap:2px; background:var(--card); border-radius:var(--radius-sm); border:1px solid var(--border); overflow:hidden; }
+    .tx-item { display:flex; align-items:center; gap:14px; padding:16px 18px; transition:background var(--transition); cursor:pointer; }
+    .tx-item:active { background:var(--accent-bg); }
+    .tx-icon { width:40px; height:40px; border-radius:12px; background:var(--accent-bg); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .tx-info { flex:1; min-width:0; }
+    .tx-name { font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tx-date { font-size:12px; color:var(--fg2); margin-top:2px; }
+    .tx-amount { font-size:15px; font-weight:600; font-family:var(--mono); flex-shrink:0; }
+    .tx-divider { height:1px; background:var(--border); margin:0 18px; }
+
+    /* FAB */
+    .fab { position:fixed; bottom:32px; left:50%; transform:translateX(-50%); width:calc(100% - 48px); max-width:382px; height:58px; border-radius:100px; border:none; background:var(--fg); color:var(--bg); font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 8px 24px rgba(0,0,0,0.25); transition:all var(--transition); letter-spacing:-0.2px; z-index:200; }
+    .fab:active { transform:translateX(-50%) scale(0.97); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .fab-icon { font-size:20px; font-weight:300; line-height:1; }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:300; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity var(--transition); }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal { background:var(--card); border-radius:28px 28px 0 0; padding:28px 24px 48px; width:100%; max-width:430px; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+    .modal-overlay.open .modal { transform:translateY(0); }
+    .modal-handle { width:36px; height:4px; background:var(--fg3); border-radius:100px; margin:0 auto 24px; }
+    .modal-title { font-size:18px; font-weight:600; letter-spacing:-0.3px; margin-bottom:24px; }
+    .modal-tabs { display:flex; background:var(--accent-bg); border-radius:12px; padding:3px; margin-bottom:20px; gap:3px; }
+    .modal-tab { flex:1; padding:10px; border-radius:9px; border:none; background:transparent; color:var(--fg2); font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer; transition:all var(--transition); }
+    .modal-tab.active { background:var(--card2); color:var(--fg); box-shadow:0 2px 8px rgba(0,0,0,0.12); }
+    .form-group { margin-bottom:16px; }
+    .form-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.5px; margin-bottom:8px; display:block; text-transform:uppercase; }
+    .form-input { width:100%; background:var(--accent-bg); border:1px solid transparent; border-radius:12px; padding:14px 16px; color:var(--fg); font-family:var(--font); font-size:15px; outline:none; transition:all var(--transition); }
+    .form-input:focus { border-color:var(--fg3); background:var(--card2); }
+    .form-input::placeholder { color:var(--fg3); }
+    .form-select { appearance:none; cursor:pointer; }
+    .form-select option { background:var(--card); }
+    .submit-btn { width:100%; height:54px; border-radius:14px; border:none; background:var(--fg); color:var(--bg); font-family:var(--font); font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; transition:all var(--transition); }
+    .submit-btn:active { transform:scale(0.98); }
+
+    /* Empty state */
+    .empty { text-align:center; padding:32px 0; color:var(--fg3); font-size:14px; }
+
+    /* Toast */
+    .toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-80px); background:var(--fg); color:var(--bg); padding:12px 20px; border-radius:100px; font-size:13px; font-weight:500; z-index:500; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); white-space:nowrap; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation:fadeIn 0.4s ease forwards; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
- <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script>
-  Babel.registerPreset('custom', {
-    presets: [['env', {modules: false}], 'react']
-  });
-</script>
- <script type="text/babel" data-presets="react">
-    const { useState, useEffect, useRef, useCallback } = React;
-    const API_BASE = "https://deonats-production.up.railway.app/api/v1";
+<div id="app" class="dark"></div>
 
-    const T = {
-      ru: { placeholder: "введите команду...", boot: ["██████████████████████████████", "  DEONATS FINANCIAL OS v1.0.0", "  INDUSTRIAL BRUTALISM KERNEL", "██████████████████████████████", "", "ЗАГРУЗКА МОДУЛЕЙ...", "ВСЕ МОДУЛИ ЗАГРУЖЕНЫ — OK", "", "ВВЕДИТЕ 'help' ДЛЯ СПИСКА КОМАНД"] },
-      en: { placeholder: "enter command...", boot: ["██████████████████████████████", "  DEONATS FINANCIAL OS v1.0.0", "  INDUSTRIAL BRUTALISM KERNEL", "██████████████████████████████", "", "LOADING MODULES...", "ALL MODULES LOADED — OK", "", "TYPE 'help' FOR COMMAND LIST"] }
-    };
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef } = React;
 
-    const HELP = {
-      ru: ["─────────────────────────────────────", "login [user] [pass]     — вход", "add [сумма] [тип] [кат] — транзакция", "check-status            — статус ядра", "goal-add [назв] [сумма] [дата] — цель", "goal-status             — список целей", "repay-debt [id] [сумма] — погасить долг", "theme [dark|light]      — тема", "lang [ru|en]            — язык", "clear                   — очистить", "─────────────────────────────────────"],
-      en: ["─────────────────────────────────────", "login [user] [pass]     — login", "add [amount] [type] [cat] — transaction", "check-status            — kernel status", "goal-add [name] [amt] [date] — goal", "goal-status             — list goals", "repay-debt [id] [amt]   — repay debt", "theme [dark|light]      — theme", "lang [ru|en]            — language", "clear                   — clear", "─────────────────────────────────────"]
-    };
+const API = "https://deonats-production.up.railway.app/api/v1";
 
-    async function apiCall(path, method="GET", body=null) {
-      try {
-        const opts = { method, headers: {"Content-Type":"application/json"} };
-        if (body) opts.body = JSON.stringify(body);
-        const res = await fetch(API_BASE + path, opts);
-        return await res.json();
-      } catch(e) {
-        return { error: true, message: "KERNEL: CONNECTION LOST" };
-      }
-    }
+const i18n = {
+  ru: {
+    balance: "Общий баланс", income: "Доходы", expenses: "Расходы",
+    goals: "Цели", transactions: "Транзакции", seeAll: "Все",
+    addTx: "Добавить транзакцию", category: "Категория", amount: "Сумма",
+    description: "Описание", add: "Добавить", typeIncome: "Доход", typeExpense: "Расход",
+    saved: "Сохранено", until: "до", noTx: "Транзакций пока нет",
+    noGoals: "Целей пока нет", food: "Еда", transport: "Транспорт",
+    entertainment: "Развлечения", salary: "Зарплата", other: "Другое",
+    shopping: "Покупки",
+  },
+  en: {
+    balance: "Total Balance", income: "Income", expenses: "Expenses",
+    goals: "Goals", transactions: "Transactions", seeAll: "All",
+    addTx: "Add Transaction", category: "Category", amount: "Amount",
+    description: "Description", add: "Add", typeIncome: "Income", typeExpense: "Expense",
+    saved: "Saved", until: "until", noTx: "No transactions yet",
+    noGoals: "No goals yet", food: "Food", transport: "Transport",
+    entertainment: "Entertainment", salary: "Salary", other: "Other",
+    shopping: "Shopping",
+  }
+};
 
-    function App() {
-      const [theme, setTheme] = useState("dark");
-      const [lang, setLang] = useState("ru");
-      const [logs, setLogs] = useState([]);
-      const [input, setInput] = useState("");
-      const [history, setHistory] = useState([]);
-      const [histIdx, setHistIdx] = useState(-1);
-      const [authed, setAuthed] = useState(false);
-      const [userId, setUserId] = useState(null);
-      const [booted, setBooted] = useState(false);
-      const endRef = useRef(null);
-      const inputRef = useRef(null);
+const CATEGORIES = {
+  ru: [
+    { id:"food", label:"Еда", icon:"🍔" },
+    { id:"transport", label:"Транспорт", icon:"🚇" },
+    { id:"entertainment", label:"Развлечения", icon:"🎮" },
+    { id:"shopping", label:"Покупки", icon:"🛍️" },
+    { id:"salary", label:"Зарплата", icon:"💼" },
+    { id:"other", label:"Другое", icon:"💡" },
+  ],
+  en: [
+    { id:"food", label:"Food", icon:"🍔" },
+    { id:"transport", label:"Transport", icon:"🚇" },
+    { id:"entertainment", label:"Entertainment", icon:"🎮" },
+    { id:"shopping", label:"Shopping", icon:"🛍️" },
+    { id:"salary", label:"Salary", icon:"💼" },
+    { id:"other", label:"Other", icon:"💡" },
+  ]
+};
 
-      const dark = theme === "dark";
-      const css = {
-        bg: dark ? "#0A0A0A" : "#E5E5E5",
-        fg: dark ? "#D4D4D4" : "#1A1A1A",
-        gold: dark ? "#C9A84C" : "#8B6914",
-        panic: dark ? "#FF3333" : "#CC0000",
-        warn: dark ? "#FF9900" : "#BB6600",
-        ok: dark ? "#33CC77" : "#006633",
-        dim: dark ? "#555" : "#888",
-        border: dark ? "#222" : "#AAA",
-        surface: dark ? "#111" : "#D8D8D8",
-      };
+const SAMPLE_TX = [
+  { id:1, name:"Зарплата", category:"salary", icon:"💼", amount:180000, type:"income", date:"23 мая" },
+  { id:2, name:"Продукты", category:"food", icon:"🍔", amount:-4200, type:"expense", date:"22 мая" },
+  { id:3, name:"Метро", category:"transport", icon:"🚇", amount:-800, type:"expense", date:"22 мая" },
+  { id:4, name:"Spotify", category:"entertainment", icon:"🎮", amount:-299, type:"expense", date:"21 мая" },
+  { id:5, name:"Фриланс", category:"other", icon:"💡", amount:25000, type:"income", date:"20 мая" },
+];
 
-      useEffect(() => { endRef.current?.scrollIntoView({behavior:"smooth"}); }, [logs]);
+const SAMPLE_GOALS = [
+  { id:1, name:"MacBook Pro", current:87000, target:200000, deadline:"2025-12-31", color:"green" },
+  { id:2, name:"Отпуск в Японии", current:45000, target:150000, deadline:"2026-03-01", color:"gold" },
+  { id:3, name:"Подушка безопасности", current:320000, target:500000, deadline:"2026-12-31", color:"green" },
+];
 
-      useEffect(() => {
-        if (booted) return;
-        setBooted(true);
-        T[lang].boot.forEach((line, i) => {
-          setTimeout(() => {
-            setLogs(prev => [...prev, {id: Date.now()+i, type: line.startsWith("██") ? "system" : line.startsWith("ВСЕ") || line.startsWith("ALL") ? "success" : line.startsWith("ВВЕДИТЕ") || line.startsWith("TYPE") ? "warn" : "system", text: line || " "}]);
-          }, i * 100);
-        });
-      }, []);
+function fmt(n) {
+  return Math.abs(n).toLocaleString("ru-RU");
+}
 
-      const addLog = useCallback((type, text) => {
-        const ts = new Date().toLocaleTimeString("en-GB",{hour12:false}).slice(0,5);
-        setLogs(prev => [...prev, {id: Date.now()+Math.random(), type, text, ts}]);
-      }, []);
+function Toast({ msg, show }) {
+  return <div className={`toast${show?" show":""}`}>{msg}</div>;
+}
 
-      const handleCmd = useCallback(async (raw) => {
-        const trimmed = raw.trim();
-        if (!trimmed) return;
-        setHistory(prev => [trimmed, ...prev.slice(0,49)]);
-        setHistIdx(-1);
-        addLog("input", trimmed);
-        const parts = trimmed.split(/\s+/);
-        const cmd = parts[0].toLowerCase();
+function BalanceCard({ t, transactions }) {
+  const income = transactions.filter(x=>x.type==="income").reduce((s,x)=>s+x.amount,0);
+  const expense = transactions.filter(x=>x.type==="expense").reduce((s,x)=>s+Math.abs(x.amount),0);
+  const balance = income - expense;
+  return (
+    <div className="balance-card fade-in">
+      <div className="balance-label">{t.balance}</div>
+      <div className="balance-amount">
+        <span>₽</span>{fmt(balance)}
+      </div>
+      <div className="balance-row">
+        <div className="balance-stat">
+          <div className="balance-stat-label">{t.income}</div>
+          <div className="balance-stat-val income">+{fmt(income)}</div>
+        </div>
+        <div className="balance-stat">
+          <div className="balance-stat-label">{t.expenses}</div>
+          <div className="balance-stat-val expense">−{fmt(expense)}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        if (cmd === "clear") { setLogs([]); return; }
-        if (cmd === "theme") { const v=parts[1]; if(v==="dark"||v==="light"){setTheme(v);addLog("success","THEME: "+v.toUpperCase());}else addLog("error","USAGE: theme [dark|light]"); return; }
-        if (cmd === "lang") { const v=parts[1]; if(v==="ru"||v==="en"){setLang(v);addLog("success","LANG: "+v.toUpperCase());}else addLog("error","USAGE: lang [ru|en]"); return; }
-        if (cmd === "help") { HELP[lang].forEach(l => addLog("system", l)); return; }
+function GoalCard({ goal, lang }) {
+  const pct = Math.round(goal.current / goal.target * 100);
+  const d = new Date(goal.deadline);
+  const dateStr = d.toLocaleDateString(lang==="ru"?"ru-RU":"en-US", {day:"numeric",month:"short",year:"numeric"});
+  return (
+    <div className="goal-card">
+      <div className="goal-top">
+        <div>
+          <div className="goal-name">{goal.name}</div>
+          <div className="goal-deadline">{lang==="ru"?"до":"until"} {dateStr}</div>
+        </div>
+        <div>
+          <div className="goal-amount">₽{fmt(goal.current)}</div>
+          <div className="goal-target">из ₽{fmt(goal.target)}</div>
+        </div>
+      </div>
+      <div className="progress-track">
+        <div className={`progress-fill ${goal.color}`} style={{width:`${pct}%`}}/>
+      </div>
+      <div className="goal-footer">
+        <div className="goal-pct">{pct}%</div>
+        <div className="goal-pct">₽{fmt(goal.target-goal.current)} {lang==="ru"?"осталось":"left"}</div>
+      </div>
+    </div>
+  );
+}
 
-        if (!authed && cmd !== "login") { addLog("warn", lang==="ru"?"ТРЕБУЕТСЯ: login [user] [pass]":"REQUIRED: login [user] [pass]"); return; }
+function TxItem({ tx, isLast }) {
+  const pos = tx.amount > 0;
+  return (
+    <>
+      <div className="tx-item">
+        <div className="tx-icon">{tx.icon}</div>
+        <div className="tx-info">
+          <div className="tx-name">{tx.name}</div>
+          <div className="tx-date">{tx.date}</div>
+        </div>
+        <div className="tx-amount" style={{color: pos?"var(--green)":"var(--fg)"}}>
+          {pos?"+":""}{pos ? fmt(tx.amount) : "−"+fmt(Math.abs(tx.amount))} ₽
+        </div>
+      </div>
+      {!isLast && <div className="tx-divider"/>}
+    </>
+  );
+}
 
-        if (cmd === "login") {
-          const [,u,p] = parts;
-          if (!u||!p) { addLog("error","USAGE: login [username] [password]"); return; }
-          addLog("system","AUTHENTICATING...");
-          const res = await apiCall("/auth/login","POST",{username:u,password:p});
-          if (res.detail||res.error) { addLog("panic", res.detail||res.message); }
-          else { setAuthed(true); setUserId(res.user_id); addLog("success",`WELCOME, ${res.username.toUpperCase()}`); }
-          return;
-        }
+function AddModal({ open, onClose, onAdd, t, lang }) {
+  const [type, setType] = useState("expense");
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("food");
+  const [desc, setDesc] = useState("");
+  const cats = CATEGORIES[lang];
 
-        if (cmd === "check-status") {
-          const res = await apiCall(`/status/${userId}`);
-          if (res.error) { addLog("error",res.message); return; }
-          addLog(res.kernel_panic?"panic":"success", res.kernel_panic?"⚡ KERNEL PANIC":"■ KERNEL OK");
-          (res.categories||[]).forEach(c => addLog(c.blocked?"panic":"output", `  ${c.category.toUpperCase()}: ${c.blocked?"BLOCKED":`${c.limit}`}`));
-          return;
-        }
+  const handleSubmit = () => {
+    if (!amount || isNaN(parseFloat(amount))) return;
+    const cat = cats.find(c=>c.id===category);
+    onAdd({
+      id: Date.now(),
+      name: desc || cat.label,
+      category,
+      icon: cat.icon,
+      amount: type==="income" ? parseFloat(amount) : -parseFloat(amount),
+      type,
+      date: new Date().toLocaleDateString(lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short"})
+    });
+    setAmount(""); setDesc(""); setCategory("food");
+    onClose();
+  };
 
-        if (cmd === "add") {
-          const [,amt,type,cat,...desc] = parts;
-          if (!amt||!type||!cat) { addLog("error","USAGE: add [сумма] [income|expense] [категория]"); return; }
-          const res = await apiCall("/transaction/add","POST",{user_id:userId,amount:parseFloat(amt),type,category:cat,description:desc.join(" ")||null});
-          if (res.error) addLog("error",res.message);
-          else if (res.status==="BLOCKED") addLog("panic",res.message);
-          else addLog("success",res.message);
-          return;
-        }
+  return (
+    <div className={`modal-overlay${open?" open":""}`} onClick={e=>{if(e.target.className.includes("modal-overlay"))onClose();}}>
+      <div className="modal">
+        <div className="modal-handle"/>
+        <div className="modal-title">{t.addTx}</div>
+        <div className="modal-tabs">
+          <button className={`modal-tab${type==="expense"?" active":""}`} onClick={()=>setType("expense")}>{t.typeExpense}</button>
+          <button className={`modal-tab${type==="income"?" active":""}`} onClick={()=>setType("income")}>{t.typeIncome}</button>
+        </div>
+        <div className="form-group">
+          <label className="form-label">{t.amount}</label>
+          <input className="form-input" type="number" placeholder="0" value={amount} onChange={e=>setAmount(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label className="form-label">{t.category}</label>
+          <select className="form-input form-select" value={category} onChange={e=>setCategory(e.target.value)}>
+            {cats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
+          </select>
+        </div>
+        <div className="form-group">
+          <label className="form-label">{t.description}</label>
+          <input className="form-input" type="text" placeholder={t.description} value={desc} onChange={e=>setDesc(e.target.value)} />
+        </div>
+        <button className="submit-btn" onClick={handleSubmit}>{t.add}</button>
+      </div>
+    </div>
+  );
+}
 
-        if (cmd === "goal-add") {
-          const [,...rest] = parts;
-          const deadline=rest.pop(), amount=rest.pop(), name=rest.join(" ");
-          if (!name||!amount||!deadline) { addLog("error","USAGE: goal-add [название] [сумма] [YYYY-MM-DD]"); return; }
-          const res = await apiCall("/goal/add","POST",{user_id:userId,name,amount:parseFloat(amount),deadline:new Date(deadline).toISOString()});
-          if (res.error) addLog("error",res.message||"ERROR");
-          else addLog("success",res.message);
-          return;
-        }
+function App() {
+  const [theme, setTheme] = useState("dark");
+  const [lang, setLang] = useState("ru");
+  const [modal, setModal] = useState(false);
+  const [transactions, setTransactions] = useState(SAMPLE_TX);
+  const [toast, setToast] = useState({show:false, msg:""});
+  const t = i18n[lang];
 
-        if (cmd === "goal-status") {
-          const res = await apiCall(`/goal/status/${userId}`);
-          if (res.error) { addLog("error",res.message); return; }
-          addLog("output",`${res.goals.length} GOALS:`);
-          res.goals.forEach(g => addLog(g.status==="violated"?"warn":"output", `  [${g.status.toUpperCase()}] ${g.name}: ${g.current_amount}/${g.target_amount}`));
-          return;
-        }
+  useEffect(() => {
+    document.getElementById("app").className = theme;
+  }, [theme]);
 
-        if (cmd === "repay-debt") {
-          const [,id,amt] = parts;
-          if (!id||!amt) { addLog("error","USAGE: repay-debt [id] [сумма]"); return; }
-          const res = await apiCall("/debt/repay","POST",{user_id:userId,debt_id:parseInt(id),amount:parseFloat(amt)});
-          if (res.error) addLog("error",res.message);
-          else addLog(res.status==="DEBT_CLOSED"?"success":"output",res.message);
-          return;
-        }
+  const showToast = (msg) => {
+    setToast({show:true, msg});
+    setTimeout(()=>setToast({show:false,msg:""}), 2000);
+  };
 
-        addLog("error",`UNKNOWN: '${cmd}' — type 'help'`);
-      }, [authed, userId, lang, addLog]);
+  const addTx = (tx) => {
+    setTransactions(prev=>[tx,...prev]);
+    showToast("✓ " + t.saved);
+  };
 
-      const colors = {input:css.gold,output:css.fg,error:css.panic,warn:css.warn,success:css.ok,system:css.dim,panic:"#FF2020"};
-      const prefixes = {input:"► ",output:"  ",error:"✖ ",warn:"⚠ ",success:"✔ ",system:"§ ",panic:"!!! "};
+  return (
+    <>
+      <Toast msg={toast.msg} show={toast.show}/>
+      <header>
+        <div className="logo">Deonats</div>
+        <div className="header-actions">
+          <button className={`icon-btn lang-btn${lang==="ru"?" active":""}`} onClick={()=>setLang("ru")}>RU</button>
+          <button className={`icon-btn lang-btn${lang==="en"?" active":""}`} onClick={()=>setLang("en")}>EN</button>
+          <button className="icon-btn" onClick={()=>setTheme(t=>t==="dark"?"light":"dark")}>
+            {theme==="dark" ? "○" : "●"}
+          </button>
+        </div>
+      </header>
 
-      return (
-        <div onClick={()=>inputRef.current?.focus()} style={{minHeight:"100vh",background:css.bg,color:css.fg,fontFamily:"'Courier New',monospace",display:"flex",flexDirection:"column",cursor:"text"}}>
-          <div style={{borderBottom:`1px solid ${css.border}`,padding:"6px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",background:css.surface,flexShrink:0}}>
-            <div>
-              <span style={{color:css.gold,fontSize:"14px",letterSpacing:"3px",fontWeight:"bold"}}>DEONATS</span>
-              <span style={{color:css.dim,fontSize:"10px",marginLeft:"10px"}}>FINANCIAL OS v1.0.0</span>
-            </div>
-            <div style={{display:"flex",gap:"10px",fontSize:"10px"}}>
-              {["dark","light"].map(t=><span key={t} onClick={e=>{e.stopPropagation();setTheme(t);}} style={{cursor:"pointer",color:theme===t?css.gold:css.dim}}>{t.toUpperCase()}</span>)}
-              <span style={{color:css.border}}>|</span>
-              {["ru","en"].map(l=><span key={l} onClick={e=>{e.stopPropagation();setLang(l);}} style={{cursor:"pointer",color:lang===l?css.gold:css.dim}}>{l.toUpperCase()}</span>)}
-              {authed && <><span style={{color:css.border}}>|</span><span style={{color:css.ok}}>● ONLINE</span></>}
-            </div>
+      <div className="scroll">
+        <BalanceCard t={t} transactions={transactions}/>
+
+        <div>
+          <div className="section-header">
+            <div className="section-title">{t.goals}</div>
           </div>
-
-          <div style={{flex:1,overflowY:"auto",padding:"12px 14px",minHeight:"400px"}}>
-            {logs.map(log=>(
-              <div key={log.id} style={{display:"flex",gap:"6px",color:colors[log.type]||css.fg,fontSize:"12px",lineHeight:"1.6",padding:"0.5px 0",fontFamily:"'Courier New',monospace"}}>
-                {log.ts && <span style={{color:css.dim,fontSize:"10px",opacity:0.5,minWidth:"40px"}}>{log.ts}</span>}
-                <span style={{opacity:0.4}}>{prefixes[log.type]||"  "}</span>
-                <span style={{flex:1,wordBreak:"break-word"}}>{log.text}</span>
-              </div>
-            ))}
-            <div ref={endRef}/>
-          </div>
-
-          <div style={{borderTop:`1px solid ${css.border}`,padding:"8px 14px",display:"flex",alignItems:"center",gap:"8px",background:css.surface,flexShrink:0}}>
-            <span style={{color:css.gold,fontSize:"12px",userSelect:"none"}}>{authed?`[${userId}]►`:"guest►"}</span>
-            <input ref={inputRef} value={input} onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{
-                if(e.key==="Enter"){handleCmd(input);setInput("");}
-                else if(e.key==="ArrowUp"){e.preventDefault();const n=Math.min(histIdx+1,history.length-1);setHistIdx(n);setInput(history[n]||"");}
-                else if(e.key==="ArrowDown"){e.preventDefault();const n=Math.max(histIdx-1,-1);setHistIdx(n);setInput(n===-1?"":(history[n]||""));}
-              }}
-              placeholder={T[lang].placeholder} autoFocus
-              style={{flex:1,background:"transparent",border:"none",outline:"none",color:css.fg,fontFamily:"'Courier New',monospace",fontSize:"12px",caretColor:css.gold}}/>
-            <span style={{color:css.dim,fontSize:"9px"}}>↑↓ · enter</span>
+          <div className="goals-list">
+            {SAMPLE_GOALS.length === 0
+              ? <div className="empty">{t.noGoals}</div>
+              : SAMPLE_GOALS.map(g=><GoalCard key={g.id} goal={g} lang={lang}/>)
+            }
           </div>
         </div>
-      );
-    }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(React.createElement(App));
-  </script>
+        <div>
+          <div className="section-header">
+            <div className="section-title">{t.transactions}</div>
+            <div className="section-link">{t.seeAll}</div>
+          </div>
+          {transactions.length === 0
+            ? <div className="empty">{t.noTx}</div>
+            : <div className="tx-list">
+                {transactions.slice(0,6).map((tx,i)=><TxItem key={tx.id} tx={tx} isLast={i===Math.min(transactions.length,6)-1}/>)}
+              </div>
+          }
+        </div>
+      </div>
+
+      <button className="fab" onClick={()=>setModal(true)}>
+        <span className="fab-icon">+</span>
+        {t.addTx}
+      </button>
+
+      <AddModal open={modal} onClose={()=>setModal(false)} onAdd={addTx} t={t} lang={lang}/>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
 </body>
 </html>
