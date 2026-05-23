@@ -10,803 +10,480 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #000000;
-      --bg2: #0D0D0D;
-      --card: #1C1C1E;
-      --card2: #2C2C2E;
-      --card3: #3A3A3C;
-      --border: rgba(255,255,255,0.08);
-      --fg: #FFFFFF;
-      --fg2: rgba(255,255,255,0.55);
-      --fg3: rgba(255,255,255,0.28);
-      --accent: #FFFFFF;
-      --accent-bg: rgba(255,255,255,0.09);
-      --green: #30D158;
-      --red: #FF453A;
-      --gold: #FFD60A;
-      --blue: #0A84FF;
-      --purple: #BF5AF2;
-      --radius: 22px;
-      --radius-sm: 14px;
-      --radius-xs: 10px;
-      --shadow: 0 8px 40px rgba(0,0,0,0.55);
-      --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --mono: 'DM Mono', 'SF Mono', monospace;
-      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
-      --duration: 0.38s;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bot: env(safe-area-inset-bottom, 0px);
+      --bg:#000000; --bg2:#0D0D0D; --card:#1C1C1E; --card2:#2C2C2E; --card3:#3A3A3C;
+      --border:rgba(255,255,255,0.08); --fg:#FFFFFF; --fg2:rgba(255,255,255,0.55);
+      --fg3:rgba(255,255,255,0.28); --accent-bg:rgba(255,255,255,0.09);
+      --green:#30D158; --red:#FF453A; --gold:#FFD60A; --blue:#0A84FF;
+      --r:22px; --rsm:14px; --rxs:10px;
+      --shadow:0 8px 40px rgba(0,0,0,0.55);
+      --font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+      --mono:'DM Mono','SF Mono',monospace;
+      --spring:cubic-bezier(0.34,1.56,0.64,1);
+      --eout:cubic-bezier(0.16,1,0.3,1);
+      --safe-top:env(safe-area-inset-top,0px);
+      --safe-bot:env(safe-area-inset-bottom,0px);
     }
-    .light {
-      --bg: #F2F2F7;
-      --bg2: #E5E5EA;
-      --card: #FFFFFF;
-      --card2: #F2F2F7;
-      --card3: #E5E5EA;
-      --border: rgba(0,0,0,0.07);
-      --fg: #000000;
-      --fg2: rgba(0,0,0,0.5);
-      --fg3: rgba(0,0,0,0.25);
-      --accent: #000000;
-      --accent-bg: rgba(0,0,0,0.06);
-      --shadow: 0 8px 40px rgba(0,0,0,0.1);
+    body.light {
+      --bg:#F2F2F7; --bg2:#E5E5EA; --card:#FFFFFF; --card2:#F2F2F7; --card3:#E5E5EA;
+      --border:rgba(0,0,0,0.07); --fg:#000000; --fg2:rgba(0,0,0,0.5); --fg3:rgba(0,0,0,0.25);
+      --accent-bg:rgba(0,0,0,0.06); --shadow:0 8px 40px rgba(0,0,0,0.1);
     }
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    html, body { height:100%; background:var(--bg); font-family:var(--font); color:var(--fg); overflow:hidden; }
-    #app { width:100%; max-width:430px; height:100dvh; margin:0 auto; background:var(--bg); position:relative; overflow:hidden; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:var(--bg);font-family:var(--font);color:var(--fg);overflow:hidden;transition:background .3s,color .3s}
+    #app{width:100%;max-width:430px;height:100dvh;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
 
-    /* ─── LOCK SCREEN ─── */
-    #lock-screen {
-      position:absolute; inset:0; z-index:500;
-      background: linear-gradient(160deg, #1a1a2e 0%, #0d0d1a 50%, #0a0a14 100%);
-      display:flex; flex-direction:column; align-items:center;
-      padding-top: calc(80px + var(--safe-top));
-      transition: transform 0.6s var(--ease-out), opacity 0.6s var(--ease-out);
-    }
-    #lock-screen.unlock-anim {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
-    .lock-time {
-      font-size: 76px; font-weight: 200; letter-spacing: -2px;
-      color: #fff; line-height: 1; margin-bottom: 6px;
-      font-variant-numeric: tabular-nums;
-    }
-    .lock-date {
-      font-size: 17px; color: rgba(255,255,255,0.7); margin-bottom: 60px;
-      font-weight: 400;
-    }
-    .lock-logo-wrap {
-      width: 80px; height: 80px; border-radius: 22px;
-      background: linear-gradient(135deg, #2a2a40, #1a1a30);
-      border: 1px solid rgba(255,255,255,0.12);
-      display:flex; align-items:center; justify-content:center;
-      margin-bottom: 14px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    }
-    .lock-logo-letter { font-size: 36px; font-weight: 300; color: #fff; }
-    .lock-app-name { font-size: 17px; font-weight: 500; color: #fff; margin-bottom: 48px; }
-    .lock-hint { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 28px; letter-spacing: 0.2px; }
-    .pinpad { width: 280px; }
-    .pin-dots { display:flex; gap: 20px; justify-content:center; margin-bottom: 32px; }
-    .pin-dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.4);
-      transition: all 0.2s var(--spring);
-    }
-    .pin-dot.filled {
-      background: #fff; border-color: #fff;
-      transform: scale(1.1);
-    }
-    .pin-dot.error {
-      background: #FF453A; border-color: #FF453A;
-      animation: shake 0.4s var(--ease-out);
-    }
-    @keyframes shake {
-      0%,100%{transform:translateX(0)}
-      20%{transform:translateX(-6px)}
-      40%{transform:translateX(6px)}
-      60%{transform:translateX(-4px)}
-      80%{transform:translateX(4px)}
-    }
-    .pin-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .pin-key {
-      height: 72px; border-radius: 50%;
-      background: rgba(255,255,255,0.12);
-      border: none; color: #fff; cursor: pointer;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap: 1px;
-      transition: transform 0.15s var(--spring), background 0.1s;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-    }
-    .pin-key:active { transform: scale(0.88); background: rgba(255,255,255,0.22); }
-    .pin-key .pk-num { font-size: 26px; font-weight: 300; line-height: 1; }
-    .pin-key .pk-sub { font-size: 9px; letter-spacing: 1.5px; color: rgba(255,255,255,0.5); text-transform:uppercase; }
-    .pin-key.pin-del, .pin-key.pin-empty { background: transparent; }
-    .pin-key.pin-del:active { background: rgba(255,255,255,0.08); transform: scale(0.88); }
-    .pin-key.pin-empty { pointer-events:none; }
+    /* ── LOCK ── */
+    #lock{position:absolute;inset:0;z-index:500;background:linear-gradient(160deg,#1a1a2e,#0d0d1a 50%,#0a0a14);display:flex;flex-direction:column;align-items:center;padding-top:calc(80px + var(--safe-top));transition:transform .6s var(--eout),opacity .6s var(--eout)}
+    #lock.out{transform:translateY(-100%);opacity:0;pointer-events:none}
+    .lk-time{font-size:76px;font-weight:200;letter-spacing:-2px;color:#fff;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums}
+    .lk-date{font-size:17px;color:rgba(255,255,255,.7);margin-bottom:56px}
+    .lk-logo{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,#2a2a40,#1a1a30);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .lk-letter{font-size:36px;font-weight:300;color:#fff}
+    .lk-name{font-size:17px;font-weight:500;color:#fff;margin-bottom:44px}
+    .lk-hint{font-size:14px;color:rgba(255,255,255,.45);margin-bottom:26px;letter-spacing:.2px;min-height:20px;transition:color .2s}
+    .lk-hint.err{color:#FF453A}
+    .pin-dots{display:flex;gap:20px;justify-content:center;margin-bottom:30px}
+    .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);transition:all .2s var(--spring)}
+    .pin-dot.on{background:#fff;border-color:#fff;transform:scale(1.1)}
+    .pin-dot.err{background:#FF453A;border-color:#FF453A;animation:shake .4s var(--eout)}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    .pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:280px}
+    .pk{height:72px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;transition:transform .15s var(--spring),background .1s;backdrop-filter:blur(20px)}
+    .pk:active{transform:scale(.88);background:rgba(255,255,255,.22)}
+    .pk-n{font-size:26px;font-weight:300;line-height:1}
+    .pk-s{font-size:9px;letter-spacing:1.5px;color:rgba(255,255,255,.5);text-transform:uppercase}
+    .pk.ghost{background:transparent;pointer-events:none}
+    .pk.del{background:transparent}
+    .pk.del:active{background:rgba(255,255,255,.08)}
 
-    /* ─── MAIN APP ─── */
-    #main-app {
-      position:absolute; inset:0; z-index:10;
-      display:flex; flex-direction:column;
-      background:var(--bg);
-      transform: scale(0.92);
-      opacity: 0;
-      pointer-events: none;
-      transition: transform 0.5s var(--spring), opacity 0.4s var(--ease-out);
-    }
-    #main-app.visible {
-      transform: scale(1);
-      opacity: 1;
-      pointer-events: all;
-    }
+    /* ── MAIN ── */
+    #main{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;background:var(--bg);transform:scale(.92);opacity:0;pointer-events:none;transition:transform .5s var(--spring),opacity .4s var(--eout)}
+    #main.show{transform:scale(1);opacity:1;pointer-events:all}
 
-    /* ─── HEADER ─── */
-    header {
-      padding: calc(16px + var(--safe-top)) 20px 12px;
-      display:flex; align-items:center; justify-content:space-between;
-      background: var(--bg);
-      position: sticky; top: 0; z-index:100;
-    }
-    .logo { font-size:18px; font-weight:600; letter-spacing:-0.4px; }
-    .header-actions { display:flex; gap:6px; align-items:center; }
-    .icon-btn {
-      height: 34px; border-radius: 100px; border:none;
-      background:var(--accent-bg); color:var(--fg); cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:15px; padding: 0 12px;
-      transition: all 0.2s var(--ease-out);
-      font-family: var(--font);
-    }
-    .icon-btn:active { transform: scale(0.92); background: var(--card3); }
-    .lang-btn { font-size:12px; font-weight:600; color:var(--fg2); letter-spacing:0.4px; }
-    .lang-btn.active { color:var(--fg); background:var(--accent-bg); }
+    /* ── HEADER ── */
+    header{padding:calc(14px + var(--safe-top)) 20px 10px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);position:sticky;top:0;z-index:100}
+    .logo{font-size:18px;font-weight:600;letter-spacing:-.4px}
+    .hdr-r{display:flex;gap:6px;align-items:center}
+    .ibtn{height:34px;border-radius:100px;border:none;background:var(--accent-bg);color:var(--fg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;padding:0 12px;font-family:var(--font);transition:all .2s var(--eout);letter-spacing:.3px}
+    .ibtn:active{transform:scale(.92);background:var(--card3)}
+    .ibtn.on{background:var(--accent-bg);color:var(--fg)}
+    .ibtn.off{color:var(--fg2)}
 
-    /* ─── SCROLL ─── */
-    .scroll {
-      flex:1; overflow-y:auto; overflow-x:hidden;
-      padding: 12px 20px calc(120px + var(--safe-bot));
-      display:flex; flex-direction:column; gap:24px;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-    }
-    .scroll::-webkit-scrollbar { display:none; }
+    /* ── SCROLL ── */
+    .scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 20px calc(110px + var(--safe-bot));display:flex;flex-direction:column;gap:22px;-webkit-overflow-scrolling:touch}
+    .scroll::-webkit-scrollbar{display:none}
 
-    /* ─── CURRENCY PILL ─── */
-    .currency-switcher {
-      display:flex; gap:6px; align-items:center;
-      background:var(--card); border-radius:100px;
-      padding: 4px; border: 1px solid var(--border);
-      align-self: flex-start;
-    }
-    .cur-btn {
-      height:30px; padding: 0 14px; border-radius:100px; border:none;
-      background:transparent; color:var(--fg2);
-      font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer;
-      transition: all 0.25s var(--spring);
-    }
-    .cur-btn.active {
-      background:var(--card2); color:var(--fg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-      transform: scale(1.02);
-    }
+    /* ── CURRENCY ── */
+    .cur-wrap{display:flex;gap:5px;background:var(--card);border-radius:100px;padding:4px;border:1px solid var(--border);align-self:flex-start}
+    .cur-btn{height:30px;padding:0 14px;border-radius:100px;border:none;background:transparent;color:var(--fg2);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .25s var(--spring)}
+    .cur-btn.on{background:var(--card2);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.18);transform:scale(1.03)}
 
-    /* ─── BALANCE CARD ─── */
-    .balance-card {
-      background:var(--card); border-radius:var(--radius);
-      padding: 24px 24px 20px;
-      border:1px solid var(--border);
-      box-shadow: var(--shadow);
-      animation: slideUp 0.5s var(--ease-out) both;
-    }
-    @keyframes slideUp {
-      from { opacity:0; transform:translateY(20px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-    .balance-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.7px; text-transform:uppercase; margin-bottom:8px; }
-    .balance-amount {
-      font-size: clamp(36px, 9vw, 44px); font-weight:300;
-      letter-spacing:-1.5px; line-height:1; margin-bottom:20px;
-      display:flex; align-items:flex-start; gap:4px;
-    }
-    .balance-currency { font-size:22px; font-weight:400; opacity:0.45; margin-top:5px; }
-    .balance-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .balance-stat {
-      background:var(--accent-bg); border-radius:var(--radius-sm); padding:14px;
-      transition: transform 0.2s var(--spring);
-    }
-    .balance-stat:active { transform:scale(0.97); }
-    .balance-stat-label { font-size:11px; color:var(--fg2); margin-bottom:5px; font-weight:500; letter-spacing:0.5px; }
-    .balance-stat-val { font-size:18px; font-weight:500; letter-spacing:-0.3px; }
-    .income { color:var(--green); }
-    .expense { color:var(--red); }
+    /* ── BALANCE ── */
+    .bal-card{background:var(--card);border-radius:var(--r);padding:24px 24px 20px;border:1px solid var(--border);box-shadow:var(--shadow);animation:sup .5s var(--eout) both}
+    @keyframes sup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .bal-lbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.7px;text-transform:uppercase;margin-bottom:8px}
+    .bal-num{font-size:clamp(34px,9vw,44px);font-weight:300;letter-spacing:-1.5px;line-height:1;margin-bottom:20px;display:flex;align-items:flex-start;gap:4px}
+    .bal-cur{font-size:22px;font-weight:400;opacity:.45;margin-top:5px}
+    .bal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .bstat{background:var(--accent-bg);border-radius:var(--rsm);padding:14px;transition:transform .2s var(--spring)}
+    .bstat:active{transform:scale(.97)}
+    .bstat-l{font-size:11px;color:var(--fg2);margin-bottom:5px;font-weight:500;letter-spacing:.5px}
+    .bstat-v{font-size:18px;font-weight:500;letter-spacing:-.3px}
+    .clr-g{color:var(--green)} .clr-r{color:var(--red)}
 
-    /* ─── SECTION ─── */
-    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-    .section-title { font-size:17px; font-weight:600; letter-spacing:-0.3px; }
-    .section-link { font-size:14px; color:var(--blue); cursor:pointer; font-weight:500; }
+    /* ── SECTION ── */
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .sec-ttl{font-size:17px;font-weight:600;letter-spacing:-.3px}
+    .sec-lnk{font-size:14px;color:var(--blue);cursor:pointer;font-weight:500}
 
-    /* ─── GOALS ─── */
-    .goals-list { display:flex; flex-direction:column; gap:12px; }
-    .goal-card {
-      background:var(--card); border-radius:var(--radius-sm); padding:18px 20px;
-      border:1px solid var(--border);
-      animation: slideUp 0.5s var(--ease-out) both;
-      transition: transform 0.2s var(--spring);
-    }
-    .goal-card:active { transform:scale(0.98); }
-    .goal-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
-    .goal-icon { width:36px; height:36px; border-radius:10px; background:var(--accent-bg); display:flex; align-items:center; justify-content:center; font-size:18px; margin-bottom:6px; }
-    .goal-name { font-size:15px; font-weight:500; }
-    .goal-deadline { font-size:12px; color:var(--fg3); margin-top:2px; }
-    .goal-right { text-align:right; }
-    .goal-amount { font-size:15px; font-weight:600; }
-    .goal-target { font-size:12px; color:var(--fg3); margin-top:2px; }
-    .progress-track { height:5px; background:var(--accent-bg); border-radius:100px; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:100px; transition:width 1s var(--ease-out); }
-    .progress-fill.green { background:var(--green); }
-    .progress-fill.gold { background:var(--gold); }
-    .progress-fill.blue { background:var(--blue); }
-    .goal-footer { display:flex; justify-content:space-between; margin-top:8px; }
-    .goal-pct { font-size:12px; color:var(--fg2); font-family:var(--mono); }
+    /* ── GOALS ── */
+    .goals{display:flex;flex-direction:column;gap:12px}
+    .gcard{background:var(--card);border-radius:var(--rsm);padding:18px 20px;border:1px solid var(--border);animation:sup .5s var(--eout) both;transition:transform .2s var(--spring)}
+    .gcard:active{transform:scale(.98)}
+    .gcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .gico{width:36px;height:36px;border-radius:10px;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:6px}
+    .gname{font-size:15px;font-weight:500}
+    .gdl{font-size:12px;color:var(--fg3);margin-top:2px}
+    .gamt{font-size:15px;font-weight:600;text-align:right}
+    .gtgt{font-size:12px;color:var(--fg3);text-align:right;margin-top:2px}
+    .ptrack{height:5px;background:var(--accent-bg);border-radius:100px;overflow:hidden}
+    .pfill{height:100%;border-radius:100px;transition:width 1s var(--eout)}
+    .pfill.g{background:var(--green)} .pfill.gold{background:var(--gold)} .pfill.b{background:var(--blue)}
+    .gfoot{display:flex;justify-content:space-between;margin-top:8px}
+    .gpct{font-size:12px;color:var(--fg2);font-family:var(--mono)}
 
-    /* ─── TRANSACTIONS ─── */
-    .tx-list {
-      background:var(--card); border-radius:var(--radius-sm);
-      border:1px solid var(--border); overflow:hidden;
-    }
-    .tx-item {
-      display:flex; align-items:center; gap:14px; padding:14px 18px;
-      transition: background 0.15s; cursor:pointer;
-      animation: slideUp 0.4s var(--ease-out) both;
-    }
-    .tx-item:active { background:var(--accent-bg); }
-    .tx-icon {
-      width:44px; height:44px; border-radius:14px;
-      background:var(--card2);
-      display:flex; align-items:center; justify-content:center;
-      font-size:20px; flex-shrink:0;
-    }
-    .tx-info { flex:1; min-width:0; }
-    .tx-name { font-size:15px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .tx-date { font-size:13px; color:var(--fg2); margin-top:2px; }
-    .tx-amount { font-size:15px; font-weight:600; font-family:var(--mono); flex-shrink:0; }
-    .tx-sep { height:1px; background:var(--border); margin:0 18px; }
+    /* ── TX ── */
+    .tx-list{background:var(--card);border-radius:var(--rsm);border:1px solid var(--border);overflow:hidden}
+    .tx-item{display:flex;align-items:center;gap:14px;padding:14px 18px;transition:background .15s;cursor:pointer;animation:sup .4s var(--eout) both}
+    .tx-item:active{background:var(--accent-bg)}
+    .tx-ico{width:44px;height:44px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+    .tx-info{flex:1;min-width:0}
+    .tx-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tx-date{font-size:13px;color:var(--fg2);margin-top:2px}
+    .tx-amt{font-size:15px;font-weight:600;font-family:var(--mono);flex-shrink:0}
+    .tx-sep{height:1px;background:var(--border);margin:0 18px}
 
-    /* ─── FAB ─── */
-    .fab {
-      position:fixed;
-      bottom: calc(28px + var(--safe-bot));
-      left:50%; transform:translateX(-50%);
-      width:calc(100% - 40px); max-width:390px;
-      height:58px; border-radius:100px; border:none;
-      background:var(--fg); color:var(--bg);
-      font-family:var(--font); font-size:16px; font-weight:600;
-      cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-      transition: transform 0.25s var(--spring), box-shadow 0.25s;
-      z-index:200; letter-spacing:-0.2px;
-    }
-    .fab:active { transform:translateX(-50%) scale(0.96); box-shadow:0 2px 10px rgba(0,0,0,0.2); }
-    .fab-plus { font-size:22px; font-weight:300; line-height:1; }
+    /* ── FAB ── */
+    .fab{position:fixed;bottom:calc(28px + var(--safe-bot));left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:390px;height:58px;border-radius:100px;border:none;background:var(--fg);color:var(--bg);font-family:var(--font);font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.3);transition:transform .25s var(--spring),box-shadow .25s;z-index:200;letter-spacing:-.2px}
+    .fab:active{transform:translateX(-50%) scale(.96);box-shadow:0 2px 10px rgba(0,0,0,.2)}
+    .fab-plus{font-size:22px;font-weight:300;line-height:1}
 
-    /* ─── MODAL ─── */
-    .modal-overlay {
-      position:fixed; inset:0; background:rgba(0,0,0,0.55);
-      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-      z-index:300; display:flex; align-items:flex-end; justify-content:center;
-      opacity:0; pointer-events:none;
-      transition: opacity 0.3s var(--ease-out);
-    }
-    .modal-overlay.open { opacity:1; pointer-events:all; }
-    .modal {
-      background:var(--card); border-radius:28px 28px 0 0;
-      padding: 20px 22px calc(36px + var(--safe-bot));
-      width:100%; max-width:430px;
-      transform:translateY(110%);
-      transition:transform 0.45s var(--spring);
-      max-height:92dvh; overflow-y:auto;
-    }
-    .modal-overlay.open .modal { transform:translateY(0); }
-    .modal-handle { width:38px; height:5px; background:var(--card3); border-radius:100px; margin:0 auto 20px; }
-    .modal-title { font-size:20px; font-weight:600; letter-spacing:-0.4px; margin-bottom:20px; }
-    .modal-tabs {
-      display:flex; background:var(--card2); border-radius:12px;
-      padding:3px; margin-bottom:18px; gap:3px;
-    }
-    .modal-tab {
-      flex:1; padding:10px 8px; border-radius:9px; border:none;
-      background:transparent; color:var(--fg2);
-      font-family:var(--font); font-size:14px; font-weight:500; cursor:pointer;
-      transition: all 0.3s var(--spring);
-    }
-    .modal-tab.active {
-      background:var(--card); color:var(--fg);
-      box-shadow:0 2px 10px rgba(0,0,0,0.18);
-      transform:scale(1.02);
-    }
-    .form-group { margin-bottom:14px; }
-    .form-label { font-size:12px; font-weight:500; color:var(--fg2); letter-spacing:0.5px; margin-bottom:7px; display:block; text-transform:uppercase; }
-    .form-input {
-      width:100%; background:var(--card2); border:1.5px solid transparent;
-      border-radius:var(--radius-xs); padding:14px 16px; color:var(--fg);
-      font-family:var(--font); font-size:16px; outline:none;
-      transition:all 0.2s var(--ease-out); -webkit-appearance:none;
-    }
-    .form-input:focus { border-color:var(--blue); background:var(--card); }
-    .form-input::placeholder { color:var(--fg3); }
-    .form-select { cursor:pointer; }
-    .form-select option { background:var(--card); }
-    .submit-btn {
-      width:100%; height:54px; border-radius:14px; border:none;
-      background:var(--fg); color:var(--bg);
-      font-family:var(--font); font-size:16px; font-weight:600; cursor:pointer;
-      margin-top:8px; transition:transform 0.2s var(--spring);
-    }
-    .submit-btn:active { transform:scale(0.97); }
+    /* ── MODAL ── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:300;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s var(--eout)}
+    .overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--card);border-radius:28px 28px 0 0;padding:20px 22px calc(36px + var(--safe-bot));width:100%;max-width:430px;transform:translateY(110%);transition:transform .45s var(--spring);max-height:92dvh;overflow-y:auto}
+    .overlay.open .modal{transform:translateY(0)}
+    .mhandle{width:38px;height:5px;background:var(--card3);border-radius:100px;margin:0 auto 20px}
+    .mttl{font-size:20px;font-weight:600;letter-spacing:-.4px;margin-bottom:20px}
+    .mtabs{display:flex;background:var(--card2);border-radius:12px;padding:3px;margin-bottom:18px;gap:3px}
+    .mtab{flex:1;padding:10px 8px;border-radius:9px;border:none;background:transparent;color:var(--fg2);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all .3s var(--spring)}
+    .mtab.on{background:var(--card);color:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.18);transform:scale(1.02)}
+    .flbl{font-size:12px;font-weight:500;color:var(--fg2);letter-spacing:.5px;margin-bottom:7px;display:block;text-transform:uppercase}
+    .finp{width:100%;background:var(--card2);border:1.5px solid transparent;border-radius:var(--rxs);padding:14px 16px;color:var(--fg);font-family:var(--font);font-size:16px;outline:none;transition:all .2s var(--eout);-webkit-appearance:none;margin-bottom:14px}
+    .finp:focus{border-color:var(--blue);background:var(--card)}
+    .finp::placeholder{color:var(--fg3)}
+    .fsel{cursor:pointer}
+    .fsel option{background:var(--card)}
+    .sbtn{width:100%;height:54px;border-radius:14px;border:none;background:var(--fg);color:var(--bg);font-family:var(--font);font-size:16px;font-weight:600;cursor:pointer;margin-top:4px;transition:transform .2s var(--spring)}
+    .sbtn:active{transform:scale(.97)}
 
-    /* ─── TOAST ─── */
-    .toast {
-      position:fixed; top: calc(16px + var(--safe-top));
-      left:50%; transform:translateX(-50%) translateY(-100px);
-      background:var(--card); color:var(--fg);
-      padding:12px 22px; border-radius:100px;
-      font-size:14px; font-weight:500; z-index:600;
-      transition:transform 0.4s var(--spring);
-      white-space:nowrap; border:1px solid var(--border);
-      box-shadow:var(--shadow);
-    }
-    .toast.show { transform:translateX(-50%) translateY(0); }
+    /* ── TOAST ── */
+    .toast{position:fixed;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-100px);background:var(--card);color:var(--fg);padding:12px 22px;border-radius:100px;font-size:14px;font-weight:500;z-index:600;transition:transform .4s var(--spring);white-space:nowrap;border:1px solid var(--border);box-shadow:var(--shadow)}
+    .toast.show{transform:translateX(-50%) translateY(0)}
 
-    /* ─── EMPTY ─── */
-    .empty { text-align:center; padding:28px 0; color:var(--fg3); font-size:14px; }
-
-    /* ─── STAGGER DELAYS ─── */
-    .stagger-1{animation-delay:0.05s}
-    .stagger-2{animation-delay:0.1s}
-    .stagger-3{animation-delay:0.15s}
-    .stagger-4{animation-delay:0.2s}
-    .stagger-5{animation-delay:0.25s}
-    .stagger-6{animation-delay:0.3s}
+    .s1{animation-delay:.05s}.s2{animation-delay:.1s}.s3{animation-delay:.15s}.s4{animation-delay:.2s}.s5{animation-delay:.25s}.s6{animation-delay:.3s}
+    .empty{text-align:center;padding:28px 0;color:var(--fg3);font-size:14px}
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- LOCK SCREEN -->
-  <div id="lock-screen">
-    <div class="lock-time" id="lock-time">--:--</div>
-    <div class="lock-date" id="lock-date">--</div>
-    <div class="lock-logo-wrap">
-      <span class="lock-logo-letter">D</span>
-    </div>
-    <div class="lock-app-name">Deonats</div>
-    <div class="lock-hint" id="lock-hint">Введите код</div>
-    <div class="pinpad">
-      <div class="pin-dots" id="pin-dots">
-        <div class="pin-dot" id="d0"></div>
-        <div class="pin-dot" id="d1"></div>
-        <div class="pin-dot" id="d2"></div>
-        <div class="pin-dot" id="d3"></div>
-        <div class="pin-dot" id="d4"></div>
-        <div class="pin-dot" id="d5"></div>
-      </div>
-      <div class="pin-grid">
-        <button class="pin-key" onclick="pinPress('1')"><span class="pk-num">1</span></button>
-        <button class="pin-key" onclick="pinPress('2')"><span class="pk-num">2</span><span class="pk-sub">ABC</span></button>
-        <button class="pin-key" onclick="pinPress('3')"><span class="pk-num">3</span><span class="pk-sub">DEF</span></button>
-        <button class="pin-key" onclick="pinPress('4')"><span class="pk-num">4</span><span class="pk-sub">GHI</span></button>
-        <button class="pin-key" onclick="pinPress('5')"><span class="pk-num">5</span><span class="pk-sub">JKL</span></button>
-        <button class="pin-key" onclick="pinPress('6')"><span class="pk-num">6</span><span class="pk-sub">MNO</span></button>
-        <button class="pin-key" onclick="pinPress('7')"><span class="pk-num">7</span><span class="pk-sub">PQRS</span></button>
-        <button class="pin-key" onclick="pinPress('8')"><span class="pk-num">8</span><span class="pk-sub">TUV</span></button>
-        <button class="pin-key" onclick="pinPress('9')"><span class="pk-num">9</span><span class="pk-sub">WXYZ</span></button>
-        <button class="pin-key pin-empty"></button>
-        <button class="pin-key" onclick="pinPress('0')"><span class="pk-num">0</span></button>
-        <button class="pin-key pin-del" onclick="pinDel()">
-          <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-            <path d="M8 1L1 8L8 15M1 8H21" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M21 2H9L4 8L9 14H21V2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
-            <path d="M14 5L18 11M18 5L14 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-    </div>
+  <!-- LOCK -->
+  <div id="lock">
+    <div class="lk-time" id="lk-time">00:00</div>
+    <div class="lk-date" id="lk-date"></div>
+    <div class="lk-logo"><span class="lk-letter">D</span></div>
+    <div class="lk-name">Deonats</div>
+    <div class="lk-hint" id="lk-hint">Введите код-пароль</div>
+    <div class="pin-dots" id="pin-dots"></div>
+    <div class="pin-grid" id="pin-grid"></div>
   </div>
 
-  <!-- MAIN APP -->
-  <div id="main-app">
-    <div id="app-inner"></div>
+  <!-- MAIN -->
+  <div id="main">
+    <header>
+      <div class="logo">Deonats</div>
+      <div class="hdr-r" id="hdr-r"></div>
+    </header>
+    <div class="scroll" id="scroll"></div>
+    <button class="fab" id="fab"></button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal" id="modal"></div>
   </div>
 
   <div class="toast" id="toast"></div>
 </div>
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
 <script>
-// ─── PIN LOGIC ───────────────────────────────────────────────────────────────
-const CORRECT_PIN = "170117";
-let pinBuffer = "";
-
-function updateDots() {
-  for(let i = 0; i < 6; i++) {
-    const d = document.getElementById('d'+i);
-    d.classList.toggle('filled', i < pinBuffer.length);
-    d.classList.remove('error');
-  }
-}
-
-function updateClock() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('lock-time').textContent = h + ':' + m;
-  const days = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  document.getElementById('lock-date').textContent =
-    days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()];
-}
-updateClock();
-setInterval(updateClock, 10000);
-
-function pinPress(digit) {
-  if(pinBuffer.length >= 6) return;
-  pinBuffer += digit;
-  updateDots();
-  if(pinBuffer.length === 6) {
-    setTimeout(() => {
-      if(pinBuffer === CORRECT_PIN) {
-        unlockApp();
-      } else {
-        for(let i = 0; i < 6; i++) document.getElementById('d'+i).classList.add('error');
-        document.getElementById('lock-hint').textContent = 'Неверный код';
-        setTimeout(() => {
-          pinBuffer = "";
-          updateDots();
-          document.getElementById('lock-hint').textContent = 'Введите код';
-        }, 600);
-      }
-    }, 80);
-  }
-}
-
-function pinDel() {
-  if(pinBuffer.length > 0) {
-    pinBuffer = pinBuffer.slice(0,-1);
-    updateDots();
-  }
-}
-
-function unlockApp() {
-  const lock = document.getElementById('lock-screen');
-  const main = document.getElementById('main-app');
-  lock.classList.add('unlock-anim');
-  main.classList.add('visible');
-  setTimeout(() => { lock.style.display = 'none'; }, 700);
-}
-</script>
-
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useCallback } = React;
-
-// ─── i18n ────────────────────────────────────────────────────────────────────
-const i18n = {
-  ru: {
-    balance:"Общий баланс", income:"Доходы", expenses:"Расходы",
-    goals:"Цели", transactions:"Транзакции", seeAll:"Все",
-    addTx:"Добавить транзакцию", category:"Категория", amount:"Сумма",
-    description:"Описание", add:"Добавить", typeIncome:"Доход", typeExpense:"Расход",
-    saved:"Добавлено ✓", noTx:"Транзакций пока нет", noGoals:"Целей пока нет",
-    until:"до", left:"осталось",
-  },
-  en: {
-    balance:"Total Balance", income:"Income", expenses:"Expenses",
-    goals:"Goals", transactions:"Transactions", seeAll:"All",
-    addTx:"Add Transaction", category:"Category", amount:"Amount",
-    description:"Description", add:"Add", typeIncome:"Income", typeExpense:"Expense",
-    saved:"Added ✓", noTx:"No transactions yet", noGoals:"No goals yet",
-    until:"until", left:"left",
-  }
-};
-
-// ─── CURRENCIES ──────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const PIN = "170117";
 const CURRENCIES = {
-  KZT: { symbol:"₸", name:"Тенге",  rate:1 },
-  RUB: { symbol:"₽", name:"Рубли",  rate:0.21 },
-  USD: { symbol:"$", name:"USD",    rate:0.00218 },
+  KZT:{sym:"₸",rate:1},
+  RUB:{sym:"₽",rate:0.21},
+  USD:{sym:"$",rate:0.00218}
 };
-
-// ─── CATEGORIES ──────────────────────────────────────────────────────────────
-const CATEGORIES = {
-  ru: [
-    {id:"food",          label:"Еда",           icon:"🍔"},
-    {id:"transport",     label:"Транспорт",      icon:"🚇"},
-    {id:"entertainment", label:"Развлечения",    icon:"🎮"},
-    {id:"shopping",      label:"Покупки",        icon:"🛍️"},
-    {id:"salary",        label:"Зарплата",       icon:"💼"},
-    {id:"other",         label:"Другое",         icon:"💡"},
-  ],
-  en: [
-    {id:"food",          label:"Food",           icon:"🍔"},
-    {id:"transport",     label:"Transport",      icon:"🚇"},
-    {id:"entertainment", label:"Entertainment",  icon:"🎮"},
-    {id:"shopping",      label:"Shopping",       icon:"🛍️"},
-    {id:"salary",        label:"Salary",         icon:"💼"},
-    {id:"other",         label:"Other",          icon:"💡"},
-  ]
+const I18N = {
+  ru:{balance:"Общий баланс",income:"Доходы",expenses:"Расходы",goals:"Цели",
+      transactions:"Транзакции",seeAll:"Все",addTx:"Добавить транзакцию",
+      category:"Категория",amount:"Сумма",description:"Описание",add:"Добавить",
+      typeIncome:"Доход",typeExpense:"Расход",saved:"Добавлено ✓",
+      noTx:"Транзакций пока нет",left:"осталось",until:"до"},
+  en:{balance:"Total Balance",income:"Income",expenses:"Expenses",goals:"Goals",
+      transactions:"Transactions",seeAll:"All",addTx:"Add Transaction",
+      category:"Category",amount:"Amount",description:"Description",add:"Add",
+      typeIncome:"Income",typeExpense:"Expense",saved:"Added ✓",
+      noTx:"No transactions yet",left:"left",until:"until"}
 };
-
-// ─── SAMPLE DATA (in KZT) ────────────────────────────────────────────────────
-const SAMPLE_TX = [
-  {id:1, name:"Зарплата",   category:"salary",        icon:"💼", amount:450000,  type:"income",  date:"23 мая"},
-  {id:2, name:"Продукты",   category:"food",          icon:"🍔", amount:-8400,   type:"expense", date:"22 мая"},
-  {id:3, name:"Метро",      category:"transport",     icon:"🚇", amount:-1600,   type:"expense", date:"22 мая"},
-  {id:4, name:"Кинотеатр",  category:"entertainment", icon:"🎮", amount:-4200,   type:"expense", date:"21 мая"},
-  {id:5, name:"Фриланс",    category:"other",         icon:"💡", amount:85000,   type:"income",  date:"20 мая"},
-  {id:6, name:"Одежда",     category:"shopping",      icon:"🛍️", amount:-18500,  type:"expense", date:"19 мая"},
+const CATS = {
+  ru:[{id:"food",l:"Еда",i:"🍔"},{id:"transport",l:"Транспорт",i:"🚇"},
+      {id:"entertainment",l:"Развлечения",i:"🎮"},{id:"shopping",l:"Покупки",i:"🛍️"},
+      {id:"salary",l:"Зарплата",i:"💼"},{id:"other",l:"Другое",i:"💡"}],
+  en:[{id:"food",l:"Food",i:"🍔"},{id:"transport",l:"Transport",i:"🚇"},
+      {id:"entertainment",l:"Entertainment",i:"🎮"},{id:"shopping",l:"Shopping",i:"🛍️"},
+      {id:"salary",l:"Salary",i:"💼"},{id:"other",l:"Other",i:"💡"}]
+};
+const GOALS_DATA = [
+  {id:1,name:"MacBook Pro",icon:"💻",current:250000,target:550000,deadline:"2025-12-31",color:"g"},
+  {id:2,name:"Отпуск / Таиланд",icon:"✈️",current:130000,target:400000,deadline:"2026-03-01",color:"gold"},
+  {id:3,name:"Резервный фонд",icon:"🛡️",current:580000,target:1000000,deadline:"2026-12-31",color:"b"}
 ];
-
-const SAMPLE_GOALS = [
-  {id:1, name:"MacBook Pro",        icon:"💻", current:250000, target:550000, deadline:"2025-12-31", color:"green"},
-  {id:2, name:"Отпуск / Таиланд",   icon:"✈️", current:130000, target:400000, deadline:"2026-03-01", color:"gold"},
-  {id:3, name:"Резервный фонд",     icon:"🛡️", current:580000, target:1000000,deadline:"2026-12-31", color:"blue"},
+let TX = [
+  {id:1,name:"Зарплата",cat:"salary",i:"💼",amt:450000,type:"income",date:"23 мая"},
+  {id:2,name:"Продукты",cat:"food",i:"🍔",amt:-8400,type:"expense",date:"22 мая"},
+  {id:3,name:"Метро",cat:"transport",i:"🚇",amt:-1600,type:"expense",date:"22 мая"},
+  {id:4,name:"Кинотеатр",cat:"entertainment",i:"🎮",amt:-4200,type:"expense",date:"21 мая"},
+  {id:5,name:"Фриланс",cat:"other",i:"💡",amt:85000,type:"income",date:"20 мая"},
+  {id:6,name:"Одежда",cat:"shopping",i:"🛍️",amt:-18500,type:"expense",date:"19 мая"}
 ];
+let state = {theme:"dark",lang:"ru",cur:"KZT",modalOpen:false,modalType:"expense",modalCat:"food"};
 
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-function fmtAmount(kztAmount, curKey) {
-  const cur = CURRENCIES[curKey];
-  const val = kztAmount * cur.rate;
-  if(Math.abs(val) >= 1000000) return (val/1000000).toFixed(1)+"M";
-  if(Math.abs(val) >= 1000)    return Math.round(val).toLocaleString("ru-RU");
-  return val < 1 && val > -1 ? val.toFixed(2) : Math.round(val).toLocaleString("ru-RU");
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function fmtAmt(kzt, curKey) {
+  const c = CURRENCIES[curKey], v = kzt * c.rate;
+  const abs = Math.abs(v);
+  if(abs >= 1000000) return (v/1000000).toFixed(1)+"M";
+  if(abs >= 1000) return Math.round(v).toLocaleString("ru-RU");
+  if(abs < 1 && abs > 0) return v.toFixed(2);
+  return Math.round(v).toLocaleString("ru-RU");
+}
+function t(k){ return I18N[state.lang][k] || k; }
+function sym(){ return CURRENCIES[state.cur].sym; }
+function el(id){ return document.getElementById(id); }
+function ce(tag,cls,html){ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2200);
 }
 
-// ─── TOAST ───────────────────────────────────────────────────────────────────
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
+// ═══════════════════════════════════════════════════════════
+//  LOCK
+// ═══════════════════════════════════════════════════════════
+let pinBuf = "";
+
+(function buildLock(){
+  // clock
+  function tick(){
+    const now = new Date();
+    const h=String(now.getHours()).padStart(2,"0"), m=String(now.getMinutes()).padStart(2,"0");
+    el("lk-time").textContent = h+":"+m;
+    const days=["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"];
+    const months=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+    el("lk-date").textContent = days[now.getDay()]+", "+now.getDate()+" "+months[now.getMonth()];
+  }
+  tick(); setInterval(tick, 10000);
+
+  // dots
+  const dotsW = el("pin-dots");
+  for(let i=0;i<6;i++){
+    const d = document.createElement("div");
+    d.className = "pin-dot"; d.id = "pd"+i;
+    dotsW.appendChild(d);
+  }
+
+  // grid
+  const grid = el("pin-grid");
+  const keys = ["1","2","3","4","5","6","7","8","9","","0","⌫"];
+  const subs = {"2":"ABC","3":"DEF","4":"GHI","5":"JKL","6":"MNO","7":"PQRS","8":"TUV","9":"WXYZ"};
+  keys.forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "pk" + (k===""?" ghost":k==="⌫"?" del":"");
+    if(k==="⌫"){
+      btn.innerHTML = `<svg width="22" height="16" viewBox="0 0 22 16" fill="none"><path d="M8 1L1 8L8 15M1 8H21" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 2H9L4 8L9 14H21V2Z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/><path d="M14 5L18 11M18 5L14 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+      btn.onclick = pinDel;
+    } else if(k!==""){
+      const sub = subs[k]||"";
+      btn.innerHTML = `<span class="pk-n">${k}</span>${sub?`<span class="pk-s">${sub}</span>`:""}`;
+      btn.onclick = ()=>pinPress(k);
+    }
+    grid.appendChild(btn);
+  });
+})();
+
+function updateDots(){
+  for(let i=0;i<6;i++){
+    const d=el("pd"+i);
+    d.classList.toggle("on", i<pinBuf.length);
+    d.classList.remove("err");
+  }
 }
 
-// ─── BALANCE CARD ─────────────────────────────────────────────────────────────
-function BalanceCard({t, transactions, currency}) {
-  const cur = CURRENCIES[currency];
-  const income  = transactions.filter(x=>x.type==="income").reduce((s,x)=>s+x.amount,0);
-  const expense = transactions.filter(x=>x.type==="expense").reduce((s,x)=>s+Math.abs(x.amount),0);
-  const balance = income - expense;
-  return (
-    <div className="balance-card">
-      <div className="balance-label">{t.balance}</div>
-      <div className="balance-amount">
-        <span className="balance-currency">{cur.symbol}</span>
-        <span>{fmtAmount(balance, currency)}</span>
-      </div>
-      <div className="balance-row">
-        <div className="balance-stat">
-          <div className="balance-stat-label">{t.income}</div>
-          <div className="balance-stat-val income">{cur.symbol}{fmtAmount(income,currency)}</div>
-        </div>
-        <div className="balance-stat">
-          <div className="balance-stat-label">{t.expenses}</div>
-          <div className="balance-stat-val expense">{cur.symbol}{fmtAmount(expense,currency)}</div>
-        </div>
-      </div>
-    </div>
-  );
+function pinPress(digit){
+  if(pinBuf.length>=6) return;
+  pinBuf+=digit; updateDots();
+  if(pinBuf.length===6){
+    setTimeout(()=>{
+      if(pinBuf===PIN){
+        el("lock").classList.add("out");
+        el("main").classList.add("show");
+        setTimeout(()=>{ el("lock").style.display="none"; renderApp(); }, 700);
+      } else {
+        for(let i=0;i<6;i++) el("pd"+i).classList.add("err");
+        const hint = el("lk-hint");
+        hint.textContent="Неверный код"; hint.classList.add("err");
+        setTimeout(()=>{ pinBuf=""; updateDots(); hint.textContent="Введите код-пароль"; hint.classList.remove("err"); }, 700);
+      }
+    },80);
+  }
+}
+function pinDel(){ if(pinBuf.length>0){pinBuf=pinBuf.slice(0,-1); updateDots();} }
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER APP
+// ═══════════════════════════════════════════════════════════
+function renderApp(){
+  renderHeader();
+  renderScroll();
+  renderFab();
 }
 
-// ─── GOAL CARD ────────────────────────────────────────────────────────────────
-function GoalCard({goal, lang, currency, delay}) {
-  const cur = CURRENCIES[currency];
-  const pct = Math.min(100, Math.round(goal.current / goal.target * 100));
-  const d = new Date(goal.deadline);
-  const dateStr = d.toLocaleDateString(lang==="ru"?"ru-RU":"en-US", {day:"numeric",month:"short",year:"numeric"});
-  const left = goal.target - goal.current;
-  return (
-    <div className={`goal-card stagger-${delay}`}>
-      <div className="goal-top">
-        <div>
-          <div className="goal-icon">{goal.icon}</div>
-          <div className="goal-name">{goal.name}</div>
-          <div className="goal-deadline">{lang==="ru"?"до":"until"} {dateStr}</div>
-        </div>
-        <div className="goal-right">
-          <div className="goal-amount">{cur.symbol}{fmtAmount(goal.current,currency)}</div>
-          <div className="goal-target">{lang==="ru"?"из":"of"} {cur.symbol}{fmtAmount(goal.target,currency)}</div>
-        </div>
-      </div>
-      <div className="progress-track">
-        <div className={`progress-fill ${goal.color}`} style={{width:`${pct}%`}}/>
-      </div>
-      <div className="goal-footer">
-        <div className="goal-pct">{pct}%</div>
-        <div className="goal-pct">{cur.symbol}{fmtAmount(left,currency)} {lang==="ru"?"осталось":"left"}</div>
-      </div>
-    </div>
-  );
-}
-
-// ─── TX ITEM ──────────────────────────────────────────────────────────────────
-function TxItem({tx, isLast, currency, delay}) {
-  const cur = CURRENCIES[currency];
-  const pos = tx.amount > 0;
-  return (
-    <>
-      <div className={`tx-item stagger-${delay}`}>
-        <div className="tx-icon">{tx.icon}</div>
-        <div className="tx-info">
-          <div className="tx-name">{tx.name}</div>
-          <div className="tx-date">{tx.date}</div>
-        </div>
-        <div className="tx-amount" style={{color:pos?"var(--green)":"var(--fg)"}}>
-          {pos?"+":" −"}{cur.symbol}{fmtAmount(Math.abs(tx.amount),currency)}
-        </div>
-      </div>
-      {!isLast && <div className="tx-sep"/>}
-    </>
-  );
-}
-
-// ─── ADD MODAL ────────────────────────────────────────────────────────────────
-function AddModal({open, onClose, onAdd, t, lang, currency}) {
-  const [type, setType]     = useState("expense");
-  const [amount, setAmount] = useState("");
-  const [cat, setCat]       = useState("food");
-  const [desc, setDesc]     = useState("");
-  const cats = CATEGORIES[lang];
-  const cur  = CURRENCIES[currency];
-
-  const handleSubmit = () => {
-    const raw = parseFloat(amount.replace(/\s/g,"").replace(",","."));
-    if(!amount || isNaN(raw) || raw <= 0) return;
-    // Convert entered amount back to KZT base
-    const kztAmt = raw / cur.rate;
-    const c = cats.find(c=>c.id===cat);
-    onAdd({
-      id: Date.now(),
-      name: desc || c.label,
-      category: cat, icon: c.icon,
-      amount: type==="income" ? kztAmt : -kztAmt,
-      type,
-      date: new Date().toLocaleDateString(lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short"})
-    });
-    setAmount(""); setDesc(""); setCat("food");
-    onClose();
+function renderHeader(){
+  const r = el("hdr-r"); r.innerHTML="";
+  ["ru","en"].forEach(l=>{
+    const b = ce("button","ibtn "+(state.lang===l?"on":"off"),l.toUpperCase());
+    b.onclick=()=>{ state.lang=l; renderApp(); };
+    r.appendChild(b);
+  });
+  const tb = ce("button","ibtn", state.theme==="dark"?"☀️":"🌙");
+  tb.onclick=()=>{
+    state.theme = state.theme==="dark"?"light":"dark";
+    document.body.className = state.theme==="light"?"light":"";
+    renderApp();
   };
+  r.appendChild(tb);
+}
 
-  return (
-    <div className={`modal-overlay${open?" open":""}`}
-         onClick={e=>{if(e.currentTarget===e.target)onClose();}}>
-      <div className="modal">
-        <div className="modal-handle"/>
-        <div className="modal-title">{t.addTx}</div>
-        <div className="modal-tabs">
-          <button className={`modal-tab${type==="expense"?" active":""}`} onClick={()=>setType("expense")}>{t.typeExpense}</button>
-          <button className={`modal-tab${type==="income"?" active":""}`}  onClick={()=>setType("income")}>{t.typeIncome}</button>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{t.amount} ({cur.symbol})</label>
-          <input className="form-input" type="number" inputMode="decimal"
-                 placeholder="0" value={amount} onChange={e=>setAmount(e.target.value)}/>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{t.category}</label>
-          <select className="form-input form-select" value={cat} onChange={e=>setCat(e.target.value)}>
-            {cats.map(c=><option key={c.id} value={c.id}>{c.icon} {c.label}</option>)}
-          </select>
-        </div>
-        <div className="form-group">
-          <label className="form-label">{t.description}</label>
-          <input className="form-input" type="text" placeholder={t.description}
-                 value={desc} onChange={e=>setDesc(e.target.value)}/>
-        </div>
-        <button className="submit-btn" onClick={handleSubmit}>{t.add}</button>
+function renderScroll(){
+  const sc = el("scroll"); sc.innerHTML="";
+
+  // Currency switcher
+  const cw = ce("div","cur-wrap");
+  Object.keys(CURRENCIES).forEach(k=>{
+    const b = ce("button","cur-btn"+(state.cur===k?" on":""), CURRENCIES[k].sym+" "+k);
+    b.onclick=()=>{ state.cur=k; renderScroll(); };
+    cw.appendChild(b);
+  });
+  sc.appendChild(cw);
+
+  // Balance card
+  const income  = TX.filter(x=>x.amt>0).reduce((s,x)=>s+x.amt,0);
+  const expense = TX.filter(x=>x.amt<0).reduce((s,x)=>s+Math.abs(x.amt),0);
+  const bal     = income - expense;
+  const bc = ce("div","bal-card");
+  bc.innerHTML = `
+    <div class="bal-lbl">${t("balance")}</div>
+    <div class="bal-num"><span class="bal-cur">${sym()}</span><span>${fmtAmt(bal,state.cur)}</span></div>
+    <div class="bal-row">
+      <div class="bstat"><div class="bstat-l">${t("income")}</div><div class="bstat-v clr-g">${sym()}${fmtAmt(income,state.cur)}</div></div>
+      <div class="bstat"><div class="bstat-l">${t("expenses")}</div><div class="bstat-v clr-r">${sym()}${fmtAmt(expense,state.cur)}</div></div>
+    </div>`;
+  sc.appendChild(bc);
+
+  // Goals
+  const gh = ce("div");
+  gh.innerHTML = `<div class="sec-hdr"><div class="sec-ttl">${t("goals")}</div></div>`;
+  const gl = ce("div","goals");
+  GOALS_DATA.forEach((g,i)=>{
+    const pct = Math.min(100,Math.round(g.current/g.target*100));
+    const d = new Date(g.deadline);
+    const ds = d.toLocaleDateString(state.lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short",year:"numeric"});
+    const left = g.target - g.current;
+    const gc = ce("div","gcard s"+(i+1));
+    gc.innerHTML = `
+      <div class="gcard-top">
+        <div><div class="gico">${g.icon}</div><div class="gname">${g.name}</div><div class="gdl">${t("until")} ${ds}</div></div>
+        <div><div class="gamt">${sym()}${fmtAmt(g.current,state.cur)}</div><div class="gtgt">${state.lang==="ru"?"из":"of"} ${sym()}${fmtAmt(g.target,state.cur)}</div></div>
       </div>
+      <div class="ptrack"><div class="pfill ${g.color}" style="width:${pct}%"></div></div>
+      <div class="gfoot"><div class="gpct">${pct}%</div><div class="gpct">${sym()}${fmtAmt(left,state.cur)} ${t("left")}</div></div>`;
+    gl.appendChild(gc);
+  });
+  gh.appendChild(gl);
+  sc.appendChild(gh);
+
+  // Transactions
+  const th = ce("div");
+  th.innerHTML = `<div class="sec-hdr"><div class="sec-ttl">${t("transactions")}</div><div class="sec-lnk">${t("seeAll")}</div></div>`;
+  if(TX.length===0){
+    th.appendChild(ce("div","empty",t("noTx")));
+  } else {
+    const tl = ce("div","tx-list");
+    TX.slice(0,6).forEach((tx,i)=>{
+      const pos = tx.amt>0;
+      const item = ce("div","tx-item s"+Math.min(i+1,6));
+      item.innerHTML = `
+        <div class="tx-ico">${tx.i}</div>
+        <div class="tx-info"><div class="tx-name">${tx.name}</div><div class="tx-date">${tx.date}</div></div>
+        <div class="tx-amt" style="color:${pos?"var(--green)":"var(--fg)"}">${pos?"+":"−"}${sym()}${fmtAmt(Math.abs(tx.amt),state.cur)}</div>`;
+      tl.appendChild(item);
+      if(i < Math.min(TX.length,6)-1) tl.appendChild(ce("div","tx-sep"));
+    });
+    th.appendChild(tl);
+  }
+  sc.appendChild(th);
+}
+
+function renderFab(){
+  const f = el("fab"); f.innerHTML="";
+  const plus = ce("span","fab-plus","+");
+  f.appendChild(plus);
+  f.appendChild(document.createTextNode(t("addTx")));
+  f.onclick = openModal;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════════════
+function openModal(){
+  state.modalOpen=true; state.modalType="expense"; state.modalCat="food";
+  renderModal();
+  el("overlay").classList.add("open");
+}
+function closeModal(){
+  el("overlay").classList.remove("open");
+}
+el("overlay").addEventListener("click", e=>{ if(e.target===el("overlay")) closeModal(); });
+
+function renderModal(){
+  const cats = CATS[state.lang];
+  const curSym = CURRENCIES[state.cur].sym;
+  const m = el("modal");
+  m.innerHTML = `
+    <div class="mhandle"></div>
+    <div class="mttl">${t("addTx")}</div>
+    <div class="mtabs">
+      <button class="mtab${state.modalType==="expense"?" on":""}" id="mtab-exp">${t("typeExpense")}</button>
+      <button class="mtab${state.modalType==="income"?" on":""}" id="mtab-inc">${t("typeIncome")}</button>
     </div>
-  );
+    <label class="flbl">${t("amount")} (${curSym})</label>
+    <input class="finp" id="minp-amt" type="number" inputmode="decimal" placeholder="0" />
+    <label class="flbl">${t("category")}</label>
+    <select class="finp fsel" id="minp-cat">
+      ${cats.map(c=>`<option value="${c.id}"${state.modalCat===c.id?" selected":""}>${c.i} ${c.l}</option>`).join("")}
+    </select>
+    <label class="flbl">${t("description")}</label>
+    <input class="finp" id="minp-desc" type="text" placeholder="${t("description")}" />
+    <button class="sbtn" id="msubmit">${t("add")}</button>`;
+
+  el("mtab-exp").onclick = ()=>{ state.modalType="expense"; renderModal(); };
+  el("mtab-inc").onclick = ()=>{ state.modalType="income";  renderModal(); };
+  el("minp-cat").onchange = e=>{ state.modalCat=e.target.value; };
+  el("msubmit").onclick = ()=>{
+    const rawAmt = parseFloat((el("minp-amt").value||"0").replace(",","."));
+    if(isNaN(rawAmt)||rawAmt<=0) return;
+    const kztAmt = rawAmt / CURRENCIES[state.cur].rate;
+    const cat    = cats.find(c=>c.id===state.modalCat);
+    const desc   = el("minp-desc").value.trim();
+    const now    = new Date();
+    const dateStr = now.toLocaleDateString(state.lang==="ru"?"ru-RU":"en-US",{day:"numeric",month:"short"});
+    TX.unshift({
+      id:Date.now(), name:desc||cat.l, cat:cat.id, i:cat.i,
+      amt: state.modalType==="income" ? kztAmt : -kztAmt,
+      type:state.modalType, date:dateStr
+    });
+    closeModal();
+    showToast(t("saved"));
+    renderScroll();
+    renderFab();
+  };
 }
-
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-function App() {
-  const [theme,        setTheme]        = useState("dark");
-  const [lang,         setLang]         = useState("ru");
-  const [currency,     setCurrency]     = useState("KZT");
-  const [modal,        setModal]        = useState(false);
-  const [transactions, setTransactions] = useState(SAMPLE_TX);
-  const t = i18n[lang];
-
-  useEffect(() => {
-    document.getElementById("app").className = theme;
-  }, [theme]);
-
-  const addTx = useCallback((tx) => {
-    setTransactions(prev=>[tx,...prev]);
-    showToast(t.saved);
-  }, [t]);
-
-  return (
-    <>
-      <header>
-        <div className="logo">Deonats</div>
-        <div className="header-actions">
-          <button className={`icon-btn lang-btn${lang==="ru"?" active":""}`} onClick={()=>setLang("ru")}>RU</button>
-          <button className={`icon-btn lang-btn${lang==="en"?" active":""}`} onClick={()=>setLang("en")}>EN</button>
-          <button className="icon-btn" style={{width:38,padding:0,justifyContent:"center"}}
-                  onClick={()=>setTheme(p=>p==="dark"?"light":"dark")}>
-            {theme==="dark" ? "☀️" : "🌙"}
-          </button>
-        </div>
-      </header>
-
-      <div className="scroll">
-
-        {/* CURRENCY SWITCHER */}
-        <div className="currency-switcher">
-          {Object.entries(CURRENCIES).map(([key,cur])=>(
-            <button key={key} className={`cur-btn${currency===key?" active":""}`}
-                    onClick={()=>setCurrency(key)}>
-              {cur.symbol} {key}
-            </button>
-          ))}
-        </div>
-
-        {/* BALANCE */}
-        <BalanceCard t={t} transactions={transactions} currency={currency}/>
-
-        {/* GOALS */}
-        <div>
-          <div className="section-header">
-            <div className="section-title">{t.goals}</div>
-          </div>
-          <div className="goals-list">
-            {SAMPLE_GOALS.map((g,i)=>
-              <GoalCard key={g.id} goal={g} lang={lang} currency={currency} delay={i+1}/>
-            )}
-          </div>
-        </div>
-
-        {/* TRANSACTIONS */}
-        <div>
-          <div className="section-header">
-            <div className="section-title">{t.transactions}</div>
-            <div className="section-link">{t.seeAll}</div>
-          </div>
-          {transactions.length === 0
-            ? <div className="empty">{t.noTx}</div>
-            : <div className="tx-list">
-                {transactions.slice(0,6).map((tx,i)=>
-                  <TxItem key={tx.id} tx={tx}
-                          isLast={i===Math.min(transactions.length,6)-1}
-                          currency={currency} delay={Math.min(i+1,6)}/>
-                )}
-              </div>
-          }
-        </div>
-      </div>
-
-      <button className="fab" onClick={()=>setModal(true)}>
-        <span className="fab-plus">+</span>
-        {t.addTx}
-      </button>
-
-      <AddModal open={modal} onClose={()=>setModal(false)}
-                onAdd={addTx} t={t} lang={lang} currency={currency}/>
-    </>
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("app-inner")).render(React.createElement(App));
 </script>
 </body>
 </html>
