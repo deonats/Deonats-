@@ -303,6 +303,7 @@ header{padding:calc(14px + var(--st)) 20px 10px;display:flex;align-items:center;
 // SUPABASE STORAGE
 // ═══════════════════════════════════════════════════════
 const supabase = supabase.createClient('ВАШ_URL_ИЗ_SUPABASE', 'ВАШ_API_KEY_ИЗ_SUPABASE');
+  const supabase = supabase.createClient('ВАШ_PROJECT_URL', 'ВАШ_API_KEY');
 
 async function getUsers() {
   const { data } = await supabase.from('users').select('*');
@@ -420,7 +421,7 @@ el('li-btn').onclick=()=>{
   if(users[u].pin!==p){el('li-err').textContent='Неверный пин-код';return}
   APP.uid=u; APP.displayName=users[u].name;
   DB.set('dn_session',{uid:u,name:users[u].name});
-  APP.data=getUserData(u);
+  APP.data = await getUserData(u);
   goToLock();
 };
 
@@ -434,7 +435,7 @@ el('rg-btn').onclick=()=>{
   const users=getUsers();
   if(users[u]){el('rg-err').textContent='Такой логин уже занят';return}
   users[u]={pin:p,name};
-  saveUsers(users);
+  await saveUserToDB(u, p, name);
   APP.uid=u; APP.displayName=name;
   DB.set('dn_session',{uid:u,name});
   APP.data={tx:[],goals:[]};
@@ -620,7 +621,7 @@ btn.onclick = () => {
   
   // Обновляем цель
   g.current = Math.min(g.target, (g.current || 0) + kztAmt);
-  save();
+async function save(){ await saveUserData(APP.uid, APP.data) }
   renderScroll();
   toast(t('saved'));
 };
