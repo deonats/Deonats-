@@ -3,8 +3,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.models.models import User, SystemLog
-
+from models import User, SystemLog
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 MAX_FAILED_ATTEMPTS = 3
